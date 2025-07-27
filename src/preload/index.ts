@@ -1,5 +1,6 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { JobPost, SearchConfig } from 'src/main/services/jobScraperService'
 
 // Custom APIs for renderer
 const api = {}
@@ -20,3 +21,25 @@ if (process.contextIsolated) {
   // @ts-ignore (define in dts)
   window.api = api
 }
+
+// Expose protected methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object
+contextBridge.exposeInMainWorld('electronAPI', {
+  platform: process.platform,
+
+  // Job search functionality
+  searchJobs: async (
+    config: SearchConfig
+  ): Promise<{
+    success: boolean
+    data?: JobPost[]
+    error?: string
+    meta: { discardedCount: number }
+  }> => {
+    return await ipcRenderer.invoke('search-jobs', config)
+  },
+
+  getJobSources: async (): Promise<string[]> => {
+    return await ipcRenderer.invoke('get-job-sources')
+  }
+})
