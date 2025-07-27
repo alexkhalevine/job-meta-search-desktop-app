@@ -2,6 +2,9 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { JobScraperService, SearchConfig } from './services/jobScraperService'
+import { isRelevantJob } from '@utils/filters'
+const jobScraperService = JobScraperService.getInstance()
 
 function createWindow(): void {
   // Create the browser window.
@@ -69,6 +72,34 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+
+// IPC handlers for job scraping
+ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
+  try {
+    console.log('Received search request:', config)
+    const foundJobs = await jobScraperService.searchJobs(config)
+
+    const allJobs = [...foundJobs]
+
+    const relevantJobs = allJobs.filter(isRelevantJob)
+    const discardedJobs = allJobs.length - relevantJobs.length
+
+    console.log(
+      `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs}`
+    )
+
+    return { success: true, data: relevantJobs, meta: { discardedCount: discardedJobs } }
+  } catch (error) {
+    console.error('Error in search-jobs handler:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-job-sources', async () => {
+  return ['karriere.at'] // Can be extended later
+})
+
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
