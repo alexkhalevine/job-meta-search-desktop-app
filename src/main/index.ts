@@ -20,6 +20,8 @@ function createWindow(): void {
     }
   })
 
+  mainWindow.setFullScreen(true)
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })

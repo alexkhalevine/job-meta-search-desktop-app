@@ -1,17 +1,21 @@
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { BadgeCheckIcon, FolderSearch } from 'lucide-react'
 
 import { useState } from 'react'
+import { ThemeProvider } from './components/theme-provider'
+import { ModeToggle } from './components/mode-toggle'
+import { Separator } from './components/ui/separator'
+import { Input } from './components/ui/input'
+import { Button } from './components/ui/button'
+import { Label } from './components/ui/label'
 
 interface JobPost {
   title: string
@@ -23,7 +27,7 @@ interface JobPost {
   source: string
 }
 
-function App(): JSX.Element {
+function AppComponent(): JSX.Element {
   const [searchQuery, setSearchQuery] = useState('nachhaltigkeit')
   const [location, setLocation] = useState('wien')
   const [jobs, setJobs] = useState<JobPost[]>([])
@@ -81,15 +85,20 @@ function App(): JSX.Element {
   }
 
   return (
-    <div className="App">
+    <div className="App p-10">
       <header className="App-header">
-        <h1>AI Job Search</h1>
-        <p>Search for jobs using our intelligent scraper</p>
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-lg">Job Search</h1>
+          <p className="text-sm">Search for jobs using our intelligent scraper</p>
+          <ModeToggle />
+        </div>
 
-        <div className="search-form">
-          <div className="form-group">
-            <label htmlFor="searchQuery">Search Keywords:</label>
-            <input
+        <Separator />
+
+        <div className="mt-10 mb-10">
+          <div className="mb-5">
+            <Label htmlFor="searchQuery">Search Keywords</Label>
+            <Input
               id="searchQuery"
               type="text"
               value={searchQuery}
@@ -98,9 +107,9 @@ function App(): JSX.Element {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="location">Location:</label>
-            <input
+          <div className="mb-5">
+            <Label htmlFor="location">Location</Label>
+            <Input
               id="location"
               type="text"
               value={location}
@@ -109,13 +118,14 @@ function App(): JSX.Element {
             />
           </div>
 
-          <button
+          <Button
+            variant={'outline'}
             onClick={handleSearch}
             disabled={isLoading || !searchQuery.trim()}
             className="search-button"
           >
             {isLoading ? 'Searching...' : 'Search Jobs'}
-          </button>
+          </Button>
         </div>
 
         {error && (
@@ -124,33 +134,67 @@ function App(): JSX.Element {
           </div>
         )}
 
+        <Separator />
+
         {jobs.length > 0 && (
-          <div className="results">
-            <h2>
-              Found {jobs.length} jobs. <small>(discarded {discardedJobCount})</small>
-            </h2>
-            <div className="jobs-list" style={{ overflowY: 'auto', maxHeight: '400px' }}>
-              {jobs.map((job, index) => (
-                <div key={index} className="job-card">
-                  <h3 className="job-title">{job.title}</h3>
-                  <p className="job-company">🏢 {job.company}</p>
-                  <p className="job-location">
-                    📍 {job.location} {job.remote && '🏠 Remote'}
-                  </p>
-                  <p className="job-description">{job.description}</p>
-                  <div className="job-footer">
-                    <span className="job-source">Source: {job.source}</span>
-                    <button onClick={() => copyJobUrl(job.url)} className="view-job-button">
-                      Copy URL
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="mt-5">
+            <Badge variant="default" className="mr-5">
+              <FolderSearch className="mr-2" />
+              Found {jobs.length} jobs
+            </Badge>
+
+            <Badge variant="secondary">
+              <BadgeCheckIcon className="mr-2" />
+              Discarded {discardedJobCount} jobs
+            </Badge>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>title</TableHead>
+                  <TableHead>company</TableHead>
+                  <TableHead>location</TableHead>
+                  <TableHead>description</TableHead>
+                  <TableHead>source</TableHead>
+                  <TableHead>action</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody className="jobs-list" style={{ overflowY: 'auto', maxHeight: '400px' }}>
+                {jobs.map((job, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{job.title}</TableCell>
+                    <TableCell>{job.company}</TableCell>
+                    <TableCell>
+                      {job.location} {job.remote && '🏠 Remote'}
+                    </TableCell>
+                    <TableCell>{job.description}</TableCell>
+                    <TableCell className="text-right">{job.source}</TableCell>
+                    <TableCell className="w-80 text-right">
+                      <Button
+                        onClick={() => copyJobUrl(job.url)}
+                        className="view-job-button"
+                        variant={'outline'}
+                      >
+                        Copy URL
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </header>
     </div>
+  )
+}
+
+function App(): JSX.Element {
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <AppComponent />
+    </ThemeProvider>
   )
 }
 
