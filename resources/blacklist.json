@@ -1,7 +1,6 @@
 [
   "friseur",
   "koch",
-  "chef",
   "küche",
   "sales",
   "gastronomie",
@@ -17,7 +16,6 @@
   "lager",
   "fahrer",
   "elektrotechnik",
-  "data-excellence",
   "buchhalter",
   "engineer",
   "concierge",
@@ -28,12 +26,10 @@
   "catering",
   "controller",
   "it-service",
-  "restaurant",
   "owner",
   "analyst",
   "housekeeping",
   "trainer",
   "architekt",
-  "network",
-  "gruppenleiter"
+  "network"
 ]

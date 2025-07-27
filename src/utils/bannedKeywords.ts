@@ -14,45 +14,6 @@ export const Blacklist = {
 
     return JSON.parse(fileContent)
   },
-  update: (newWord: string): { success: boolean; message: string; error?: string } => {
-    try {
-      const isDev = process.env.NODE_ENV === 'development'
-      // In development, use the resources folder directly
-      // In production, use the app's resource path
-      const resourcePath = isDev
-        ? path.join(process.cwd(), 'resources', 'blacklist.json')
-        : path.join(process.resourcesPath, 'blacklist.json')
-
-      // Read current blacklist
-      const currentList = Blacklist.load()
-
-      // Check if word already exists (case-insensitive)
-      const normalizedNewWord = newWord.toLowerCase().trim()
-      if (currentList.some((word) => word.toLowerCase() === normalizedNewWord)) {
-        return {
-          success: false,
-          message: `Word "${newWord}" already exists in the blacklist`
-        }
-      }
-
-      // Add new word to the list
-      currentList.push(normalizedNewWord)
-
-      // Write updated list back to file
-      fs.writeFileSync(resourcePath, JSON.stringify(currentList, null, 2), 'utf8')
-
-      return {
-        success: true,
-        message: `Successfully added "${newWord}" to the blacklist`
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: `Failed to update blacklist`,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
-    }
-  },
   save: (blacklistArray: string[]): { success: boolean; message: string; error?: string } => {
     try {
       const isDev = process.env.NODE_ENV === 'development'

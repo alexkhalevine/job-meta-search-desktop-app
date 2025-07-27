@@ -76,6 +76,26 @@ function AppComponent(): JSX.Element {
     }
   }
 
+  const deleteFromBlacklist = async (wordToDelete: string): Promise<void> => {
+    try {
+      // Remove the word from the current blacklist array
+      const updatedBlacklist = blacklist.filter((word) => word !== wordToDelete)
+      
+      // Save the updated blacklist to file
+      const result = await window.electronAPI.updateBlacklist(updatedBlacklist)
+      
+      if (result.success) {
+        // Update the UI state
+        setBlacklist(updatedBlacklist)
+        console.log(`Successfully deleted "${wordToDelete}" from blacklist`)
+      } else {
+        setError(`Failed to delete word: ${result.message}`)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete word from blacklist')
+    }
+  }
+
   useEffect(() => {
     loadBlacklist()
   }, [])
@@ -136,8 +156,13 @@ function AppComponent(): JSX.Element {
             <div>
               {blacklist.map((blacklistText: string) => {
                 return (
-                  <Button key={blacklistText} className="mr-2 mb-2" variant={'outline'}>
-                    <BadgeX />
+                  <Button
+                    key={blacklistText}
+                    className="delete-blacklisted-word mr-2 mb-2 group"
+                    variant={'outline'}
+                    onClick={() => deleteFromBlacklist(blacklistText)}
+                  >
+                    <BadgeX className="opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                     {blacklistText}
                   </Button>
                 )
