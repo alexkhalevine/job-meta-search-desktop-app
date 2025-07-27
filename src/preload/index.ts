@@ -41,5 +41,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   getJobSources: async (): Promise<string[]> => {
     return await ipcRenderer.invoke('get-job-sources')
+  },
+
+  loadBlacklist: async (): Promise<string[]> => {
+    return await ipcRenderer.invoke('load-blacklist')
+  },
+
+  updateBlacklist: async (
+    blacklistArray: string[]
+  ): Promise<{ success: boolean; message: string; error?: string }> => {
+    return await ipcRenderer.invoke('update-blacklist', blacklistArray)
   }
 })

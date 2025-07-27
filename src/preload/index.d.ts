@@ -9,6 +9,12 @@ interface CustomElectronAPI {
     meta: { discardedCount: number }
   }>
   getJobSources: () => Promise<string[]>
+  loadBlacklist: () => Promise<string[]>
+  updateBlacklist: (blacklistArray: string[]) => Promise<{
+    success: boolean
+    message: string
+    error?: string
+  }>
 }
 
 interface SearchConfig {

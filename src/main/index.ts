@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { JobScraperService, SearchConfig } from './services/jobScraperService'
 import { isRelevantJob } from '@utils/filters'
+import { Blacklist } from '@utils/bannedKeywords'
 const jobScraperService = JobScraperService.getInstance()
 
 function createWindow(): void {
@@ -20,7 +21,8 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.setFullScreen(true)
+  //mainWindow.setFullScreen(true)
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -75,7 +77,6 @@ app.on('window-all-closed', () => {
   }
 })
 
-
 // IPC handlers for job scraping
 ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
   try {
@@ -102,6 +103,15 @@ ipcMain.handle('get-job-sources', async () => {
   return ['karriere.at'] // Can be extended later
 })
 
+ipcMain.handle('load-blacklist', async () => {
+  const blacklist = Blacklist.load()
+  return blacklist
+})
+
+ipcMain.handle('update-blacklist', async (_event, blacklistArray: string[]) => {
+  const result = Blacklist.save(blacklistArray)
+  return result
+})
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

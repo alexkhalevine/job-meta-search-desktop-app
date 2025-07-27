@@ -7,9 +7,9 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { BadgeCheckIcon, FolderSearch } from 'lucide-react'
+import { BadgeCheckIcon, BadgeX, FolderSearch } from 'lucide-react'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ThemeProvider } from './components/theme-provider'
 import { ModeToggle } from './components/mode-toggle'
 import { Separator } from './components/ui/separator'
@@ -31,11 +31,12 @@ function AppComponent(): JSX.Element {
   const [searchQuery, setSearchQuery] = useState('nachhaltigkeit')
   const [location, setLocation] = useState('wien')
   const [jobs, setJobs] = useState<JobPost[]>([])
+  const [blacklist, setBlacklist] = useState<Array<string>>([])
   const [discardedJobCount, setDiscardedJobCount] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSearch = async () => {
+  const handleSearch = async (): Promise<void> => {
     console.log('Window object:', window)
     console.log('ElectronAPI available:', !!window.electronAPI)
     console.log('ElectronAPI object:', window.electronAPI)
@@ -67,7 +68,19 @@ function AppComponent(): JSX.Element {
     }
   }
 
-  const copyJobUrl = async (url: string) => {
+  const loadBlacklist = async () => {
+    const blacklist = await window.electronAPI.loadBlacklist()
+
+    if (blacklist && blacklist.length > 0) {
+      setBlacklist(blacklist)
+    }
+  }
+
+  useEffect(() => {
+    loadBlacklist()
+  }, [])
+
+  const copyJobUrl = async (url: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(url)
       console.log('URL copied to clipboard:', url)
@@ -116,6 +129,20 @@ function AppComponent(): JSX.Element {
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g., wien, vienna"
             />
+          </div>
+
+          <div id="blaclist-container" className="mb-5">
+            <p className="text-sm mb-2">Blacklist</p>
+            <div>
+              {blacklist.map((blacklistText: string) => {
+                return (
+                  <Button key={blacklistText} className="mr-2 mb-2" variant={'outline'}>
+                    <BadgeX />
+                    {blacklistText}
+                  </Button>
+                )
+              })}
+            </div>
           </div>
 
           <Button
