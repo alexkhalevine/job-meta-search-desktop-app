@@ -1,5 +1,6 @@
 import { scrapeKarriere } from './karriereScrapper'
 import { scrapStepstone } from './stepStoneScrapper'
+import { scrapWillhaben } from './willhabbenScrapper'
 import { serpScrapper } from './serpScrapper'
 
 export interface JobPost {
@@ -34,10 +35,11 @@ export class JobScraperService {
   }
 
   public async searchJobs(config: SearchConfig): Promise<JobPost[]> {
-    // Run both scrapers in parallel and handle failures gracefully
-    const [karriereJobs, stepstoneJobs, googleJobs] = await Promise.allSettled([
+    // Run all scrapers in parallel and handle failures gracefully
+    const [karriereJobs, stepstoneJobs, willhabenJobs, googleJobs] = await Promise.allSettled([
       scrapeKarriere(config),
       scrapStepstone(config),
+      scrapWillhaben(config),
       serpScrapper(config)
     ])
 
@@ -57,11 +59,18 @@ export class JobScraperService {
       console.error('Stepstone.at scraping failed:', stepstoneJobs.reason)
     }
 
-    // Handle stepstone.at results
+    // Handle willhaben.at results
+    if (willhabenJobs.status === 'fulfilled') {
+      allJobs.push(...willhabenJobs.value)
+    } else {
+      console.error('Willhaben.at scraping failed:', willhabenJobs.reason)
+    }
+
+    // Handle google jobs results
     if (googleJobs.status === 'fulfilled') {
       allJobs.push(...googleJobs.value)
     } else {
-      console.error('google job scraping failed:', googleJobs.reason)
+      console.error('Google job scraping failed:', googleJobs.reason)
     }
 
     return allJobs

@@ -17,7 +17,6 @@ export function isRelevantJob(job: {
   const locationOk = locationMatch || remoteMatch
 
   const bannedKeywords = Blacklist.load()
-  console.log('bannedKeywords', bannedKeywords)
 
   const isBlocked = bannedKeywords.some(
     (keyword) => title.includes(keyword) || url.includes(keyword) || description.includes(keyword)

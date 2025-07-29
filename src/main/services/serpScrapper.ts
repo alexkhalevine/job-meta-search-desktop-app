@@ -41,8 +41,6 @@ export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
     const results = response.data.jobs_results
     if (!Array.isArray(results)) return []
 
-    console.log('google jobs: ', results)
-
     const jobs: JobPost[] = results.map(
       (job: GoogleJobsType): JobPost => ({
         title: job.title || '',

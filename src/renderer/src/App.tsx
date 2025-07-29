@@ -166,26 +166,28 @@ function AppComponent(): JSX.Element {
         <Separator />
 
         <div className="mt-10 mb-10">
-          <div className="mb-5">
-            <Label htmlFor="searchQuery">Search Keywords</Label>
-            <Input
-              id="searchQuery"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="e.g., nachhaltigkeit, sustainability"
-            />
-          </div>
+          <div className="flex gap-5">
+            <div className="mb-5">
+              <Label htmlFor="searchQuery">Search Keywords</Label>
+              <Input
+                id="searchQuery"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="e.g., nachhaltigkeit, sustainability"
+              />
+            </div>
 
-          <div className="mb-5">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., wien, vienna"
-            />
+            <div className="mb-5">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g., wien, vienna"
+              />
+            </div>
           </div>
 
           <div id="blaclist-container" className="mb-5">
@@ -205,11 +207,14 @@ function AppComponent(): JSX.Element {
                 )
               })}
             </div>
-            <div className="mt-4">
-              <Label htmlFor="newBlacklistWord">New blacklist word</Label>
+            <div className="mt-4 flex items-center gap-5">
+              <Label htmlFor="newBlacklistWord" className="">
+                Add blacklist word
+              </Label>
               <Input
                 id="newBlacklistWord"
                 type="text"
+                className="max-w-80"
                 placeholder="e.g., pimp, dealer"
                 value={newBlacklistWord}
                 onChange={(e) => setNewBlacklistWord(e.target.value)}
@@ -223,21 +228,25 @@ function AppComponent(): JSX.Element {
                 id="saveNewBlacklistWord"
                 onClick={addToBlacklist}
                 disabled={!newBlacklistWord.trim()}
-                className="mt-2"
+                className=""
               >
                 Save
               </Button>
             </div>
           </div>
 
-          <Button
-            variant={'outline'}
-            onClick={handleSearch}
-            disabled={isLoading || !searchQuery.trim()}
-            className="search-button"
-          >
-            {isLoading ? 'Searching...' : 'Search Jobs'}
-          </Button>
+          <Separator />
+
+          <div className="flex justify-center mt-9">
+            <Button
+              variant={'destructive'}
+              onClick={handleSearch}
+              disabled={isLoading || !searchQuery.trim()}
+              className="search-button"
+            >
+              {isLoading ? 'Searching...' : 'Search Jobs'}
+            </Button>
+          </div>
         </div>
 
         {error && (
@@ -280,7 +289,11 @@ function AppComponent(): JSX.Element {
                     <TableCell>
                       {job.location} {job.remote && '🏠 Remote'}
                     </TableCell>
-                    <TableCell>{job.description}</TableCell>
+                    <TableCell>
+                      {job.description.length > 300
+                        ? `${job.description.substring(0, 300)}...`
+                        : job.description}
+                    </TableCell>
                     <TableCell className="text-right">{job.source}</TableCell>
                     <TableCell className="w-80 text-right">
                       <Button
