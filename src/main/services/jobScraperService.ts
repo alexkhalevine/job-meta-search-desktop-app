@@ -2,6 +2,7 @@ import { scrapeKarriere } from './scappers/karriereScrapper'
 import { scrapStepstone } from './scappers/stepStoneScrapper'
 import { scrapWillhaben } from './scappers/willhabbenScrapper'
 import { serpScrapper } from './scappers/serpScrapper'
+import { scrapeJobsAt } from './scappers/jobsAtScrapper'
 
 export interface JobPost {
   title: string
@@ -36,12 +37,14 @@ export class JobScraperService {
 
   public async searchJobs(config: SearchConfig): Promise<JobPost[]> {
     // Run all scrapers in parallel and handle failures gracefully
-    const [karriereJobs, stepstoneJobs, willhabenJobs, googleJobs] = await Promise.allSettled([
-      scrapeKarriere(config),
-      scrapStepstone(config),
-      scrapWillhaben(config),
-      serpScrapper(config)
-    ])
+    const [karriereJobs, stepstoneJobs, willhabenJobs, jobsAtJobs, googleJobs] =
+      await Promise.allSettled([
+        scrapeKarriere(config),
+        scrapStepstone(config),
+        scrapWillhaben(config),
+        scrapeJobsAt(config),
+        serpScrapper(config)
+      ])
 
     const allJobs: JobPost[] = []
 
@@ -64,6 +67,13 @@ export class JobScraperService {
       allJobs.push(...willhabenJobs.value)
     } else {
       console.error('Willhaben.at scraping failed:', willhabenJobs.reason)
+    }
+
+    // Handle jobs.at results
+    if (jobsAtJobs.status === 'fulfilled') {
+      allJobs.push(...jobsAtJobs.value)
+    } else {
+      console.error('Jobs.at scraping failed:', jobsAtJobs.reason)
     }
 
     // Handle google jobs results

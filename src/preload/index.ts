@@ -39,7 +39,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return await ipcRenderer.invoke('search-jobs', config)
   },
 
-  getJobSources: async (): Promise<string[]> => {
+  getJobSources: async (): Promise<any> => {
     return await ipcRenderer.invoke('get-job-sources')
   },
 

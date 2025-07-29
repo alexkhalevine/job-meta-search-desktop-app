@@ -86,13 +86,18 @@ ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
     const allJobs = [...foundJobs]
 
     const relevantJobs = allJobs.filter(isRelevantJob)
-    const discardedJobs = allJobs.length - relevantJobs.length
+    const discardedJobs = allJobs.filter((job) => !isRelevantJob(job))
+    const discardedTitles = discardedJobs.map((job) => job.title)
 
     console.log(
-      `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs}`
+      `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`
     )
 
-    return { success: true, data: relevantJobs, meta: { discardedCount: discardedJobs } }
+    return {
+      success: true,
+      data: relevantJobs,
+      meta: { discardedCount: discardedJobs.length, discardedList: discardedTitles }
+    }
   } catch (error) {
     console.error('Error in search-jobs handler:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
