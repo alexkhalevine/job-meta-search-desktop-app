@@ -34,7 +34,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     success: boolean
     data?: JobPost[]
     error?: string
-    meta: { discardedCount: number }
+    meta: { discardedCount: number, discardedList: Array<string> }
   }> => {
     return await ipcRenderer.invoke('search-jobs', config)
   },

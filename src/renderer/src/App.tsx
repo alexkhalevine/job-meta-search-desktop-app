@@ -1,11 +1,3 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { BadgeCheckIcon, BadgeX, FolderSearch } from 'lucide-react'
 
@@ -16,6 +8,8 @@ import { Separator } from './components/ui/separator'
 import { Input } from './components/ui/input'
 import { Button } from './components/ui/button'
 import { Label } from './components/ui/label'
+import { JobList } from './components/custom/JobList'
+import { Popover, PopoverContent, PopoverTrigger } from './components/ui/popover'
 
 interface JobPost {
   title: string
@@ -34,6 +28,8 @@ function AppComponent(): JSX.Element {
   const [blacklist, setBlacklist] = useState<Array<string>>([])
   const [newBlacklistWord, setNewBlacklistWord] = useState('')
   const [discardedJobCount, setDiscardedJobCount] = useState<number>(0)
+  const [discardedJobTitles, setDiscardedJobTitles] = useState<Array<string>>([])
+
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -59,6 +55,7 @@ function AppComponent(): JSX.Element {
       if (result.success && result.data) {
         setJobs(result.data)
         setDiscardedJobCount(result.meta.discardedCount)
+        setDiscardedJobTitles(result.meta.discardedList)
       } else {
         setError(result.error || 'Unknown error occurred')
       }
@@ -136,23 +133,6 @@ function AppComponent(): JSX.Element {
   useEffect(() => {
     loadBlacklist()
   }, [])
-
-  const copyJobUrl = async (url: string): Promise<void> => {
-    try {
-      await navigator.clipboard.writeText(url)
-      console.log('URL copied to clipboard:', url)
-      // You could add a toast notification here if desired
-    } catch (err) {
-      console.error('Failed to copy URL:', err)
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = url
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
-    }
-  }
 
   return (
     <div className="App p-10">
@@ -264,50 +244,17 @@ function AppComponent(): JSX.Element {
               Found {jobs.length} jobs
             </Badge>
 
-            <Badge variant="secondary">
-              <BadgeCheckIcon className="mr-2" />
-              Discarded {discardedJobCount} jobs
-            </Badge>
+            <Popover>
+              <PopoverTrigger>
+                <Badge variant="secondary">
+                  <BadgeCheckIcon className="mr-2" />
+                  Discarded {discardedJobCount} jobs
+                </Badge>
+              </PopoverTrigger>
+              <PopoverContent className="text-xs w-96">{discardedJobTitles.join(', ')}</PopoverContent>
+            </Popover>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>title</TableHead>
-                  <TableHead>company</TableHead>
-                  <TableHead>location</TableHead>
-                  <TableHead>description</TableHead>
-                  <TableHead>source</TableHead>
-                  <TableHead>action</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody className="jobs-list" style={{ overflowY: 'auto', maxHeight: '400px' }}>
-                {jobs.map((job, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{job.title}</TableCell>
-                    <TableCell>{job.company}</TableCell>
-                    <TableCell>
-                      {job.location} {job.remote && '🏠 Remote'}
-                    </TableCell>
-                    <TableCell>
-                      {job.description.length > 300
-                        ? `${job.description.substring(0, 300)}...`
-                        : job.description}
-                    </TableCell>
-                    <TableCell className="text-right">{job.source}</TableCell>
-                    <TableCell className="w-80 text-right">
-                      <Button
-                        onClick={() => copyJobUrl(job.url)}
-                        className="view-job-button"
-                        variant={'outline'}
-                      >
-                        Copy URL
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <JobList jobs={jobs} />
           </div>
         )}
       </header>
