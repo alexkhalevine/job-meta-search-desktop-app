@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: shadcn-electron-app
+productName: jobseek
 directories:
   buildResources: build
 files:
@@ -9,10 +9,14 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+extraResources:
+  - from: "resources"
+    to: "resources"
+    filter: ["**/*"]
 asarUnpack:
   - resources/**
 win:
-  executableName: shadcn-electron-app
+  executableName: jobseek
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
