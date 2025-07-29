@@ -1,14 +1,13 @@
 import axios from 'axios'
-import { JobPost, SearchConfig } from './jobScraperService'
+import { JobPost, SearchConfig } from '../jobScraperService'
 import * as cheerio from 'cheerio'
 
-const BASE_URL = 'https://www.karriere.at/jobs'
+const BASE_URL = 'https://www.jobs.at'
 
-export async function scrapeKarriere(config: SearchConfig): Promise<JobPost[]> {
-  const query = `keywords=${config.searchQuery}&locations=${config.location}`
-  const url = `${BASE_URL}?${query}`
+export async function scrapeJobsAt(config: SearchConfig): Promise<JobPost[]> {
+  const url = `${BASE_URL}/${config.searchQuery}/${config.searchQuery}`
 
-  console.log('... scraping karriere.at ', url)
+  console.log('... scraping jobs.at ', url)
 
   try {
     const { data: html } = await axios.get(url, {
@@ -22,7 +21,7 @@ export async function scrapeKarriere(config: SearchConfig): Promise<JobPost[]> {
     const $ = cheerio.load(html)
     const jobPosts: JobPost[] = []
 
-    $('.m-jobsList__item').each((_, el) => {
+    $('.c-search-listing li').each((_, el) => {
       const linkEl = $(el).find('.m-jobsListItem__title > a')
       const title = linkEl.text().trim()
 

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { JobPost, SearchConfig } from './jobScraperService'
+import { JobPost, SearchConfig } from '../jobScraperService'
 import * as cheerio from 'cheerio'
 
 const BASE_URL = 'https://www.willhaben.at'

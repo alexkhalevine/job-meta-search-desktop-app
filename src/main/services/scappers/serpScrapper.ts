@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { JobPost, SearchConfig } from './jobScraperService'
+import { JobPost, SearchConfig } from '../jobScraperService'
 import { SettingsLoader } from '@utils/settingsLoader'
 
 const SERPAPI_URL = 'https://serpapi.com/search.json'

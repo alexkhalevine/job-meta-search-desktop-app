@@ -1,7 +1,7 @@
-import { scrapeKarriere } from './karriereScrapper'
-import { scrapStepstone } from './stepStoneScrapper'
-import { scrapWillhaben } from './willhabbenScrapper'
-import { serpScrapper } from './serpScrapper'
+import { scrapeKarriere } from './scappers/karriereScrapper'
+import { scrapStepstone } from './scappers/stepStoneScrapper'
+import { scrapWillhaben } from './scappers/willhabbenScrapper'
+import { serpScrapper } from './scappers/serpScrapper'
 
 export interface JobPost {
   title: string
