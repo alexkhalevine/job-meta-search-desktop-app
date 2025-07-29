@@ -32,6 +32,7 @@ function AppComponent(): JSX.Element {
   const [location, setLocation] = useState('wien')
   const [jobs, setJobs] = useState<JobPost[]>([])
   const [blacklist, setBlacklist] = useState<Array<string>>([])
+  const [newBlacklistWord, setNewBlacklistWord] = useState('')
   const [discardedJobCount, setDiscardedJobCount] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -68,7 +69,7 @@ function AppComponent(): JSX.Element {
     }
   }
 
-  const loadBlacklist = async () => {
+  const loadBlacklist = async (): Promise<void> => {
     const blacklist = await window.electronAPI.loadBlacklist()
 
     if (blacklist && blacklist.length > 0) {
@@ -80,10 +81,10 @@ function AppComponent(): JSX.Element {
     try {
       // Remove the word from the current blacklist array
       const updatedBlacklist = blacklist.filter((word) => word !== wordToDelete)
-      
+
       // Save the updated blacklist to file
       const result = await window.electronAPI.updateBlacklist(updatedBlacklist)
-      
+
       if (result.success) {
         // Update the UI state
         setBlacklist(updatedBlacklist)
@@ -93,6 +94,42 @@ function AppComponent(): JSX.Element {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete word from blacklist')
+    }
+  }
+
+  const addToBlacklist = async (): Promise<void> => {
+    try {
+      const trimmedWord = newBlacklistWord.trim().toLowerCase()
+
+      // Validation
+      if (!trimmedWord) {
+        setError('Please enter a word to add to the blacklist')
+        return
+      }
+
+      // Check if word already exists
+      if (blacklist.includes(trimmedWord)) {
+        setError(`"${trimmedWord}" is already in the blacklist`)
+        return
+      }
+
+      // Add the word to the current blacklist array
+      const updatedBlacklist = [...blacklist, trimmedWord]
+
+      // Save the updated blacklist to file
+      const result = await window.electronAPI.updateBlacklist(updatedBlacklist)
+
+      if (result.success) {
+        // Update the UI state
+        setBlacklist(updatedBlacklist)
+        setNewBlacklistWord('') // Clear the input field
+        setError(null) // Clear any previous errors
+        console.log(`Successfully added "${trimmedWord}" to blacklist`)
+      } else {
+        setError(`Failed to add word: ${result.message}`)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add word to blacklist')
     }
   }
 
@@ -167,6 +204,29 @@ function AppComponent(): JSX.Element {
                   </Button>
                 )
               })}
+            </div>
+            <div className="mt-4">
+              <Label htmlFor="newBlacklistWord">New blacklist word</Label>
+              <Input
+                id="newBlacklistWord"
+                type="text"
+                placeholder="e.g., pimp, dealer"
+                value={newBlacklistWord}
+                onChange={(e) => setNewBlacklistWord(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addToBlacklist()
+                  }
+                }}
+              />
+              <Button
+                id="saveNewBlacklistWord"
+                onClick={addToBlacklist}
+                disabled={!newBlacklistWord.trim()}
+                className="mt-2"
+              >
+                Save
+              </Button>
             </div>
           </div>
 

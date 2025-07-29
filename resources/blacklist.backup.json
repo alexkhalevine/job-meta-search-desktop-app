@@ -1,5 +1,7 @@
 [
   "friseur",
+  "koch",
+  "chef",
   "küche",
   "sales",
   "gastronomie",
@@ -11,22 +13,27 @@
   "backstube",
   "kantine",
   "entwickler",
+  "filialleiter",
+  "lager",
   "fahrer",
+  "elektrotechnik",
+  "data-excellence",
   "buchhalter",
   "engineer",
-  "concierge",
+  "concierge", //www.stepstone.at/stellenangebote--Junior-Concierge-m-w-d-Wien-Mandarin-Oriental-Vienna--912986-inline.html
   "aushilfe",
   "attendant",
   "bediener",
   "commodity",
+  "catering",
   "controller",
   "it-service",
+  "restaurant",
   "owner",
   "analyst",
   "housekeeping",
   "trainer",
   "architekt",
   "network",
-  "xwx",
-  "cwdcwedcwedc"
+  "gruppenleiter"
 ]
