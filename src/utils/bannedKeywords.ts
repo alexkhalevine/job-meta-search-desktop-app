@@ -27,18 +27,11 @@ export const Blacklist = {
         console.log('Selected path:', resourcePath)
       }
 
-      console.log('Loading blacklist from:', resourcePath)
-      console.log('File exists:', fs.existsSync(resourcePath))
-
       if (!fs.existsSync(resourcePath)) {
         console.error('Blacklist file not found, creating default file')
 
         // Create default blacklist content
-        const defaultBlacklist = [
-          'friseur', 'koch', 'chef', 'küche', 'gastronomie', 'pflege',
-          'reinigung', 'verkauf', 'kanzlei', 'backstube', 'kantine',
-          'entwickler', 'filialleiter', 'lager', 'fahrer'
-        ]
+        const defaultBlacklist = []
 
         try {
           // Try to create the directory if it doesn't exist
@@ -62,11 +55,7 @@ export const Blacklist = {
     } catch (error) {
       console.error('Error loading blacklist:', error)
       // Return a default blacklist on error
-      return [
-        'friseur', 'koch', 'chef', 'küche', 'gastronomie', 'pflege',
-        'reinigung', 'verkauf', 'kanzlei', 'backstube', 'kantine',
-        'entwickler', 'filialleiter', 'lager', 'fahrer'
-      ]
+      return []
     }
   },
   save: (blacklistArray: string[]): { success: boolean; message: string; error?: string } => {

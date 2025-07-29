@@ -1,21 +1,30 @@
 import axios from 'axios'
-import { JobPost } from './jobScraperService'
+import { JobPost, SearchConfig } from './jobScraperService'
+import { SettingsLoader } from '@utils/settingsLoader'
 
-const SERPAPI_KEY = process.env.SERPAPI_KEY!
 const SERPAPI_URL = 'https://serpapi.com/search.json'
 
-async function fetchGoogleJobs(query: string, location: string): Promise<JobPost[]> {
+export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
+  const SERPAPI_KEY = SettingsLoader.getSerpApiKey()
+
+  if (!SERPAPI_KEY) {
+    console.error('SERPAPI_KEY not found in settings.json')
+    return []
+  }
+
   const response = await axios.get(SERPAPI_URL, {
     params: {
       engine: 'google_jobs',
-      q: query,
-      location,
+      q: config.searchQuery,
+      location: config.location,
       api_key: SERPAPI_KEY
     }
   })
 
   const results = response.data.jobs_results
   if (!Array.isArray(results)) return []
+
+  console.log('google jobs: ', results)
 
   const jobs: JobPost[] = results.map(
     (job: any): JobPost => ({
@@ -35,25 +44,4 @@ async function fetchGoogleJobs(query: string, location: string): Promise<JobPost
   )
 
   return jobs
-}
-
-export async function scrapeGoogleJobs(): Promise<JobPost[]> {
-  const defaultQuery = process.env.WEBSCRAPPER_SEARCH_QUERY || 'sustainability'
-  const defaultLocation = process.env.LOCATION || 'Wien'
-
-  const queries = [defaultQuery, 'life cycle assessment', 'resource management']
-  const locations = [defaultLocation]
-
-  const allJobs: JobPost[] = []
-
-  for (const q of queries) {
-    for (const loc of locations) {
-      const jobs = await fetchGoogleJobs(q, loc)
-      allJobs.push(...jobs)
-    }
-  }
-
-  console.log(`Found ${allJobs.length} jobs from Google Jobs.`)
-
-  return allJobs
 }
