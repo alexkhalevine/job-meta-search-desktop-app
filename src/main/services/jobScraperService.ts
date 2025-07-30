@@ -83,6 +83,16 @@ export class JobScraperService {
       console.error('Google job scraping failed:', googleJobs.reason)
     }
 
+    /*   for (const job of relevantJobs) {
+    const summary = await analyzeJob(`Job title: ${job.title}, job dscription: ${job.description}`);
+    console.log(`🔍 ${job.title} @ ${job.company} (${job.location})`);
+    console.log('\n');
+    console.log("AI summary:");
+    console.log(summary);
+    console.log('➡️', job.url);
+    console.log('\n---\n');
+  } */
+
     return allJobs
   }
 }

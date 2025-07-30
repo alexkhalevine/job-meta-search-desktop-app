@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { BadgeCheckIcon, BadgeX, FolderSearch } from 'lucide-react'
+import { BadgeCheckIcon, BadgeX, FolderSearch, Settings } from 'lucide-react'
 
 import { useEffect, useState } from 'react'
 import { ThemeProvider } from './components/theme-provider'
@@ -10,6 +10,7 @@ import { Button } from './components/ui/button'
 import { Label } from './components/ui/label'
 import { JobList } from './components/custom/JobList'
 import { Popover, PopoverContent, PopoverTrigger } from './components/ui/popover'
+import { SettingsComponent } from './components/custom/Settings'
 
 interface JobPost {
   title: string
@@ -140,7 +141,10 @@ function AppComponent(): JSX.Element {
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-lg">Job Search</h1>
           <p className="text-sm">Search for jobs using our intelligent scraper</p>
-          <ModeToggle />
+          <div className="flex gap-2">
+            <SettingsComponent />
+            <ModeToggle />
+          </div>
         </div>
 
         <Separator />
@@ -251,7 +255,9 @@ function AppComponent(): JSX.Element {
                   Discarded {discardedJobCount} jobs
                 </Badge>
               </PopoverTrigger>
-              <PopoverContent className="text-xs w-96">{discardedJobTitles.join(', ')}</PopoverContent>
+              <PopoverContent className="text-xs w-96">
+                {discardedJobTitles.join(', ')}
+              </PopoverContent>
             </Popover>
 
             <JobList jobs={jobs} />
