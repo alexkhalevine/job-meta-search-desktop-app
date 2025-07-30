@@ -1,4 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import { Settings } from 'electron'
 
 interface CustomElectronAPI {
   platform: string
@@ -13,6 +14,11 @@ interface CustomElectronAPI {
   updateBlacklist: (blacklistArray: string[]) => Promise<{
     success: boolean
     message: string
+    error?: string
+  }>
+  loadSettings: () => Promise<{
+    success: boolean
+    data?: Settings
     error?: string
   }>
 }

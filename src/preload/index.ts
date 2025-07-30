@@ -34,13 +34,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     success: boolean
     data?: JobPost[]
     error?: string
-    meta: { discardedCount: number, discardedList: Array<string> }
+    meta: { discardedCount: number; discardedList: Array<string> }
   }> => {
     return await ipcRenderer.invoke('search-jobs', config)
-  },
-
-  getJobSources: async (): Promise<any> => {
-    return await ipcRenderer.invoke('get-job-sources')
   },
 
   loadBlacklist: async (): Promise<string[]> => {
@@ -51,5 +47,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     blacklistArray: string[]
   ): Promise<{ success: boolean; message: string; error?: string }> => {
     return await ipcRenderer.invoke('update-blacklist', blacklistArray)
+  },
+  loadSettings: async (): Promise<{ success: boolean; message: string; error?: string }> => {
+    return await ipcRenderer.invoke('get-settings')
   }
 })

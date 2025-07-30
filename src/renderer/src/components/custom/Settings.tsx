@@ -11,8 +11,44 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Separator } from '../ui/separator'
+import { useEffect, useState } from 'react'
+
+type SettingsType = {
+  secrets?: {
+    SERPAPI_KEY: string
+  }
+  serpQuota?: number
+}
 
 export const SettingsComponent = (): JSX.Element => {
+  const [error, setError] = useState<string | null>(null)
+  const [settings, setSettings] = useState<SettingsType>()
+
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  const fetchSettings = async (): Promise<SettingsType | any> => {
+    if (!window.electronAPI) {
+      setError('Electron API not available. Make sure the preload script is loaded.')
+      return
+    }
+
+    try {
+      const result = await window.electronAPI.loadSettings()
+
+      if (result.success && result.data) {
+        setSettings(result.data as SettingsType)
+      } else {
+        setError(result.error || 'Unknown error occurred')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to search jobs')
+    }
+  }
+
+  console.log('...... settings', settings)
+
   const onChangeSerpApiKey = () => {}
   return (
     <Sheet>

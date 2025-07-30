@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { JobScraperService, SearchConfig } from './services/jobScraperService'
 import { isRelevantJob } from '@utils/filters'
 import { Blacklist } from '@utils/bannedKeywords'
+import { SettingsLoader } from '@utils/settingsLoader'
 const jobScraperService = JobScraperService.getInstance()
 
 function createWindow(): void {
@@ -21,8 +22,8 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.setFullScreen(true)
-  //mainWindow.webContents.openDevTools()
+  //mainWindow.setFullScreen(true)
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -104,9 +105,6 @@ ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
   }
 })
 
-ipcMain.handle('get-job-sources', async () => {
-  return ['karriere.at'] // Can be extended later
-})
 
 ipcMain.handle('load-blacklist', async () => {
   const blacklist = Blacklist.load()
@@ -118,5 +116,14 @@ ipcMain.handle('update-blacklist', async (_event, blacklistArray: string[]) => {
   return result
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+ipcMain.handle('get-settings', async () => {
+  try {
+    const result = SettingsLoader.getSafeSettingsForUI()
+    return {
+      success: true,
+      data: result
+    }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})

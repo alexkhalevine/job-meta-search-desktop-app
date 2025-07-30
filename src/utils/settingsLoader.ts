@@ -5,6 +5,23 @@ interface Settings {
   secrets: {
     SERPAPI_KEY: string
   }
+  serpQuota?: number
+}
+
+interface SerpResponse {
+  account_id: string
+  api_key: string
+  account_email: string
+  plan_id: string
+  plan_name: string
+  plan_monthly_price: number
+  searches_per_month: number
+  plan_searches_left: number
+  extra_credits: number
+  total_searches_left: number
+  this_month_usage: number
+  last_hour_searches: number
+  account_rate_limit_per_hour: number
 }
 
 export const SettingsLoader = {
@@ -71,6 +88,35 @@ export const SettingsLoader = {
           SERPAPI_KEY: ''
         }
       }
+    }
+  },
+
+  getSafeSettingsForUI: async (): Promise<Settings> => {
+    const settings = SettingsLoader.load()
+
+    // Mask the API key - show only first 4 characters, rest as asterisks
+    const apiKey = settings.secrets.SERPAPI_KEY
+    const maskedApiKey = apiKey.substring(0, 4) + '*'.repeat(apiKey.length - 4)
+    const serpQuota = await SettingsLoader.getSerpQuota(apiKey)
+
+    return {
+      ...settings,
+      serpQuota,
+      secrets: {
+        SERPAPI_KEY: maskedApiKey
+      }
+    }
+  },
+
+  getSerpQuota: async (apiKey: string): Promise<number> => {
+    try {
+      const response = await fetch(`https://serpapi.com/account?api_key=${apiKey}`)
+      const responseJSON = (await response.json()) as SerpResponse
+
+      return responseJSON.total_searches_left
+    } catch (error) {
+      // TODO: add better error handling
+      return 0
     }
   },
 
