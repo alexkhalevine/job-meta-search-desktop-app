@@ -12,6 +12,7 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Separator } from '../ui/separator'
 import { useEffect, useState } from 'react'
+import { Badge } from '../ui/badge'
 
 type SettingsType = {
   secrets?: {
@@ -47,8 +48,6 @@ export const SettingsComponent = (): JSX.Element => {
     }
   }
 
-  console.log('...... settings', settings)
-
   const onChangeSerpApiKey = () => {}
   return (
     <Sheet>
@@ -63,21 +62,27 @@ export const SettingsComponent = (): JSX.Element => {
           <SheetDescription>Add keys, update your preferences.</SheetDescription>
         </SheetHeader>
         <Separator />
-        <div className="mt-5">
-          <Label htmlFor="searchQuery">
-            <a href="https://serpapi.com/dashboard">SERP API key</a>
-          </Label>
-          <Input
-            id="searchQuery"
-            type="text"
-            onChange={onChangeSerpApiKey}
-            placeholder="Enter here your key"
-            className="mt-2"
-          />
-          <Button className="mt-5" variant={'secondary'}>
-            Update
-          </Button>
-        </div>
+        {settings && (
+          <div className="mt-5">
+            <div className="flex justify-between">
+              <Label htmlFor="searchQuery">
+                <a href="https://serpapi.com/dashboard">SERP API key</a>
+              </Label>
+              <Badge>Remaining quota: {settings?.serpQuota}</Badge>
+            </div>
+            <Input
+              id="searchQuery"
+              type="text"
+              onChange={onChangeSerpApiKey}
+              placeholder={settings?.secrets?.SERPAPI_KEY}
+              className="mt-2"
+            />
+
+            <Button className="mt-5" variant={'secondary'}>
+              Update
+            </Button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   )

@@ -22,8 +22,8 @@ function createWindow(): void {
     }
   })
 
-  //mainWindow.setFullScreen(true)
-  mainWindow.webContents.openDevTools()
+  mainWindow.setFullScreen(true)
+  //mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -105,7 +105,6 @@ ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
   }
 })
 
-
 ipcMain.handle('load-blacklist', async () => {
   const blacklist = Blacklist.load()
   return blacklist
@@ -118,7 +117,7 @@ ipcMain.handle('update-blacklist', async (_event, blacklistArray: string[]) => {
 
 ipcMain.handle('get-settings', async () => {
   try {
-    const result = SettingsLoader.getSafeSettingsForUI()
+    const result = await SettingsLoader.getSafeSettingsForUI()
     return {
       success: true,
       data: result

@@ -96,26 +96,46 @@ export const SettingsLoader = {
 
     // Mask the API key - show only first 4 characters, rest as asterisks
     const apiKey = settings.secrets.SERPAPI_KEY
-    const maskedApiKey = apiKey.substring(0, 4) + '*'.repeat(apiKey.length - 4)
-    const serpQuota = await SettingsLoader.getSerpQuota(apiKey)
+    const maskedApiKey =
+      apiKey.length > 4 ? apiKey.substring(0, 4) + '*'.repeat(apiKey.length - 4) : apiKey
+
+    let serpQuota = 0
+    try {
+      serpQuota = await SettingsLoader.getSerpQuota(apiKey)
+    } catch (error) {
+      console.warn('Failed to fetch SERP quota:', error)
+      serpQuota = 0
+    }
 
     return {
-      ...settings,
-      serpQuota,
       secrets: {
         SERPAPI_KEY: maskedApiKey
-      }
+      },
+      serpQuota
     }
   },
 
   getSerpQuota: async (apiKey: string): Promise<number> => {
+    if (!apiKey || apiKey.trim() === '') {
+      return 0
+    }
+
     try {
       const response = await fetch(`https://serpapi.com/account?api_key=${apiKey}`)
+
+      if (!response.ok) {
+        console.warn(`SERP API responded with status: ${response.status}`)
+        return 0
+      }
+
       const responseJSON = (await response.json()) as SerpResponse
 
-      return responseJSON.total_searches_left
+      // Ensure we return a valid number
+      return typeof responseJSON.total_searches_left === 'number'
+        ? responseJSON.total_searches_left
+        : 0
     } catch (error) {
-      // TODO: add better error handling
+      console.warn('Error fetching SERP quota:', error)
       return 0
     }
   },
