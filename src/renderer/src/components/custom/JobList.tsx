@@ -7,7 +7,19 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Button } from '../ui/button'
-export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
+
+export interface JobPost {
+  title: string
+  company: string
+  location: string
+  remote: boolean
+  description: string
+  url: string
+  source: string
+  links?: Array<{ title: string; link: string }>
+}
+
+export const JobList = ({ jobs }: { jobs: JobPost[] }): JSX.Element => {
   const copyJobUrl = async (url: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(url)
