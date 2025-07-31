@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import dotenv from 'dotenv'
+dotenv.config()
 
 interface Settings {
   secrets: {
@@ -32,7 +34,13 @@ export const SettingsLoader = {
 
       if (isDev) {
         // In development, use the resources folder directly
-        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
+        // settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
+
+        return {
+          secrets: {
+            SERPAPI_KEY: process.env.SERPAPI_KEY ?? ''
+          }
+        }
       } else {
         // In production, try multiple possible paths for macOS app bundles
         const possiblePaths = [
