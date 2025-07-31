@@ -18,10 +18,10 @@ type GoogleJobsType = {
   }
   description: string
   job_id: string
-  apply_options: {
+  apply_options: Array<{
     title: string
     link: string
-  }
+  }>
 }
 
 export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
