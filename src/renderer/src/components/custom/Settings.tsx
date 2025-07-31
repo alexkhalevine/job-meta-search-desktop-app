@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react'
+import { Settings, Terminal } from 'lucide-react'
 import { Button } from '../ui/button'
 import {
   Sheet,
@@ -13,6 +13,7 @@ import { Input } from '../ui/input'
 import { Separator } from '../ui/separator'
 import { useEffect, useState } from 'react'
 import { Badge } from '../ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 
 type SettingsType = {
   secrets?: {
@@ -50,40 +51,51 @@ export const SettingsComponent = (): JSX.Element => {
 
   const onChangeSerpApiKey = () => {}
   return (
-    <Sheet>
-      <SheetTrigger>
-        <Button variant={'outline'}>
-          <Settings />
-        </Button>
-      </SheetTrigger>
-      <SheetContent>
-        <SheetHeader className="mb-5">
-          <SheetTitle>Application settings</SheetTitle>
-          <SheetDescription>Add keys, update your preferences.</SheetDescription>
-        </SheetHeader>
-        <Separator />
-        {settings && (
-          <div className="mt-5">
-            <div className="flex justify-between">
-              <Label htmlFor="searchQuery">
-                <a href="https://serpapi.com/dashboard">SERP API key</a>
-              </Label>
-              <Badge>Remaining quota: {settings?.serpQuota}</Badge>
-            </div>
-            <Input
-              id="searchQuery"
-              type="text"
-              onChange={onChangeSerpApiKey}
-              placeholder={settings?.secrets?.SERPAPI_KEY}
-              className="mt-2"
-            />
+    <>
+      {error && (
+        <Alert variant="destructive">
+          <Terminal />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            You can add components and dependencies to your app using the cli.
+          </AlertDescription>
+        </Alert>
+      )}
+      <Sheet>
+        <SheetTrigger>
+          <Button variant={'outline'}>
+            <Settings />
+          </Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader className="mb-5">
+            <SheetTitle>Application settings</SheetTitle>
+            <SheetDescription>Add keys, update your preferences.</SheetDescription>
+          </SheetHeader>
+          <Separator />
+          {settings && (
+            <div className="mt-5">
+              <div className="flex justify-between">
+                <Label htmlFor="searchQuery">
+                  <a href="https://serpapi.com/dashboard">SERP API key</a>
+                </Label>
+                <Badge>Remaining quota: {settings?.serpQuota}</Badge>
+              </div>
+              <Input
+                id="searchQuery"
+                type="text"
+                onChange={onChangeSerpApiKey}
+                placeholder={settings?.secrets?.SERPAPI_KEY}
+                className="mt-2"
+              />
 
-            <Button className="mt-5" variant={'secondary'}>
-              Update
-            </Button>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
+              <Button className="mt-5" variant={'secondary'}>
+                Update
+              </Button>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   )
 }

@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { BadgeCheckIcon, BadgeX, FolderSearch, Settings } from 'lucide-react'
+import { BadgeCheckIcon, BadgeX, FolderSearch } from 'lucide-react'
 
 import { useEffect, useState } from 'react'
 import { ThemeProvider } from './components/theme-provider'

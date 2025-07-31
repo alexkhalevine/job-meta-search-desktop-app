@@ -56,9 +56,6 @@ export async function scrapWillhaben(config: SearchConfig): Promise<JobPost[]> {
       }
     })
 
-    console.log(`Found ${jobPosts.length} jobs from willhaben.at.`)
-    console.log(jobPosts)
-
     return jobPosts
   } catch (error) {
     console.error('Error scraping willhaben.at:', error)
