@@ -18,6 +18,10 @@ type GoogleJobsType = {
   }
   description: string
   job_id: string
+  apply_options: {
+    title: string
+    link: string
+  }
 }
 
 export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
@@ -36,7 +40,8 @@ export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
         engine: 'google_jobs',
         q: config.searchQuery,
         location: config.location,
-        api_key: SERPAPI_KEY
+        api_key: SERPAPI_KEY,
+        gl: 'at'
       }
     })
 
@@ -57,7 +62,8 @@ export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
             .map(([key, value]) => `${key}: ${value}`)
             .join(', '),
         url: job.share_link,
-        source: `google jobs - ${job.via}`
+        source: `google jobs - ${job.via}`,
+        links: job.apply_options
       })
     )
     return jobs

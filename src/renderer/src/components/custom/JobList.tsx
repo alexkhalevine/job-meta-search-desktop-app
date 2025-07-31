@@ -24,6 +24,13 @@ export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
       document.body.removeChild(textArea)
     }
   }
+  const Links = (job) => {
+    return job.links.map((linkResult: { title: string; link: string }) => (
+      <Button key={linkResult.link} onClick={() => copyJobUrl(linkResult.link)}>
+        {linkResult.title}
+      </Button>
+    ))
+  }
   return (
     <Table>
       <TableHeader>
@@ -52,13 +59,17 @@ export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
             </TableCell>
             <TableCell className="text-right">{job.source}</TableCell>
             <TableCell className="w-80 text-right">
-              <Button
-                onClick={() => copyJobUrl(job.url)}
-                className="view-job-button"
-                variant={'outline'}
-              >
-                Copy URL
-              </Button>
+              {job.links && job.links.length > 0 ? (
+                Links(job)
+              ) : (
+                <Button
+                  onClick={() => copyJobUrl(job.url)}
+                  className="view-job-button"
+                  variant={'outline'}
+                >
+                  Copy URL
+                </Button>
+              )}
             </TableCell>
           </TableRow>
         ))}
