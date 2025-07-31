@@ -95,10 +95,8 @@ export const SettingsLoader = {
   },
 
   getSafeSettingsForUI: async (): Promise<Settings> => {
-    const settings = SettingsLoader.load()
-
     // Mask the API key - show only first 4 characters, rest as asterisks
-    const apiKey = settings.secrets.SERPAPI_KEY
+    const apiKey = SettingsLoader.getSerpApiKey()
     const maskedApiKey =
       apiKey.length > 4 ? apiKey.substring(0, 4) + '*'.repeat(apiKey.length - 4) : apiKey
 
