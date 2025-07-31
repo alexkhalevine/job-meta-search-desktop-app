@@ -50,5 +50,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   loadSettings: async (): Promise<{ success: boolean; message: string; error?: string }> => {
     return await ipcRenderer.invoke('get-settings')
+  },
+  updateSerpApiKey: async (newKey: string): Promise<{ success: boolean; error?: string }> => {
+    return await ipcRenderer.invoke('settings-update-serp-key', newKey)
   }
 })

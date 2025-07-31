@@ -1,4 +1,4 @@
-import { Settings, Terminal } from 'lucide-react'
+import { CheckCircle2Icon, Settings, Terminal } from 'lucide-react'
 import { Button } from '../ui/button'
 import {
   Sheet,
@@ -25,6 +25,8 @@ type SettingsType = {
 export const SettingsComponent = (): JSX.Element => {
   const [error, setError] = useState<string | null>(null)
   const [settings, setSettings] = useState<SettingsType>()
+  const [settingsUpdated, setSettingsUpdated] = useState<boolean>(false)
+  const [newKey, setNewKey] = useState<string>('')
 
   useEffect(() => {
     fetchSettings()
@@ -42,16 +44,48 @@ export const SettingsComponent = (): JSX.Element => {
       if (result.success && result.data) {
         setSettings(result.data as SettingsType)
       } else {
+        setSettingsUpdated(false)
         setError(result.error || 'Unknown error occurred')
+      }
+    } catch (err) {
+      setSettingsUpdated(false)
+      setError(err instanceof Error ? err.message : 'Failed to search jobs')
+    }
+  }
+
+  const updateKey = async () => {
+    if (!newKey) {
+      return
+    }
+
+    if (!window.electronAPI) {
+      setError('Electron API not available. Make sure the preload script is loaded.')
+      return
+    }
+
+    try {
+      const result = await window.electronAPI.updateSerpApiKey(newKey)
+
+      if (result) {
+        setError(null)
+        setSettingsUpdated(true)
+      } else {
+        throw new Error('could not update SERP API key')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to search jobs')
     }
   }
 
-  const onChangeSerpApiKey = () => {}
   return (
     <>
+      {settingsUpdated && (
+        <Alert>
+          <CheckCircle2Icon />
+          <AlertTitle>Success! Your changes have been saved</AlertTitle>
+          <AlertDescription>New key is saved in your settings.</AlertDescription>
+        </Alert>
+      )}
       {error && (
         <Alert variant="destructive">
           <Terminal />
@@ -84,12 +118,13 @@ export const SettingsComponent = (): JSX.Element => {
               <Input
                 id="searchQuery"
                 type="text"
-                onChange={onChangeSerpApiKey}
+                onChange={(e) => setNewKey(e.target.value)}
                 placeholder={settings?.secrets?.SERPAPI_KEY}
                 className="mt-2"
+                value={newKey}
               />
 
-              <Button className="mt-5" variant={'secondary'}>
+              <Button className="mt-5" variant={'secondary'} onClick={updateKey}>
                 Update
               </Button>
             </div>

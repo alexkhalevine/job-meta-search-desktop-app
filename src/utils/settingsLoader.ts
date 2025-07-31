@@ -26,21 +26,16 @@ interface SerpResponse {
   account_rate_limit_per_hour: number
 }
 
+const isDev = process.env.NODE_ENV === 'development'
+
 export const SettingsLoader = {
   load: (): Settings => {
     try {
-      const isDev = process.env.NODE_ENV === 'development'
       let settingsPath: string
 
       if (isDev) {
         // In development, use the resources folder directly
-        // settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
-
-        return {
-          secrets: {
-            SERPAPI_KEY: process.env.SERPAPI_KEY ?? ''
-          }
-        }
+        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
       } else {
         // In production, try multiple possible paths for macOS app bundles
         const possiblePaths = [
@@ -150,6 +145,70 @@ export const SettingsLoader = {
 
   getSerpApiKey: (): string => {
     const settings = SettingsLoader.load()
+
+    if (isDev) {
+      // in dev, we can key beeing set in process.env.SERPAPI_KEY
+      // so that we do not have to commit settings.json
+      return settings.secrets.SERPAPI_KEY
+        ? settings.secrets.SERPAPI_KEY
+        : process.env.SERPAPI_KEY || ''
+    }
+
     return settings.secrets.SERPAPI_KEY
+  },
+
+  updateSerpApiKey: (newApiKey: string): boolean => {
+    try {
+      const isDev = process.env.NODE_ENV === 'development'
+      let settingsPath: string
+
+      if (isDev) {
+        // In development, use the resources folder directly
+        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
+      } else {
+        // In production, try multiple possible paths for macOS app bundles
+        const possiblePaths = [
+          path.join(process.resourcesPath, 'resources', 'settings.json'),
+          path.join(process.resourcesPath, 'settings.json'),
+          path.join(__dirname, '..', '..', 'resources', 'settings.json'),
+          path.join(process.cwd(), 'resources', 'settings.json'),
+          // Additional paths for macOS app bundle
+          path.join(process.resourcesPath, 'app', 'resources', 'settings.json'),
+          path.join(__dirname, '..', '..', '..', 'Resources', 'resources', 'settings.json')
+        ]
+
+        settingsPath = possiblePaths.find((p) => fs.existsSync(p)) || possiblePaths[0]
+      }
+
+      // Load current settings or create default if file doesn't exist
+      let currentSettings: Settings
+      if (fs.existsSync(settingsPath)) {
+        const fileContent = fs.readFileSync(settingsPath, 'utf8')
+        currentSettings = JSON.parse(fileContent)
+      } else {
+        currentSettings = {
+          secrets: {
+            SERPAPI_KEY: ''
+          }
+        }
+        // Create directory if it doesn't exist
+        const dir = path.dirname(settingsPath)
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true })
+        }
+      }
+
+      // Update the API key
+      currentSettings.secrets.SERPAPI_KEY = newApiKey
+
+      // Write back to file
+      fs.writeFileSync(settingsPath, JSON.stringify(currentSettings, null, 2), 'utf8')
+      console.log('Successfully updated SERPAPI_KEY in settings.json')
+
+      return true
+    } catch (error) {
+      console.error('Error updating SERPAPI_KEY:', error)
+      return false
+    }
   }
 }

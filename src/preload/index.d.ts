@@ -21,6 +21,7 @@ interface CustomElectronAPI {
     data?: Settings
     error?: string
   }>
+  updateSerpApiKey: (newKey: string) => Promise<boolean>
 }
 
 interface SearchConfig {

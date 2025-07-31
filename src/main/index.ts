@@ -22,8 +22,8 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.setFullScreen(true)
-  //mainWindow.webContents.openDevTools()
+  //mainWindow.setFullScreen(true)
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -121,6 +121,17 @@ ipcMain.handle('get-settings', async () => {
     return {
       success: true,
       data: result
+    }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('settings-update-serp-key', async (_event, newKey: string) => {
+  try {
+    const result = await SettingsLoader.updateSerpApiKey(newKey)
+    return {
+      success: result
     }
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
