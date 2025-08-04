@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { BadgeCheckIcon, BadgeX, FolderSearch } from 'lucide-react'
+import { BadgeX, FolderSearch, Trash } from 'lucide-react'
 
 import { useEffect, useState } from 'react'
 import { ThemeProvider } from './components/theme-provider'
@@ -9,8 +9,18 @@ import { Input } from './components/ui/input'
 import { Button } from './components/ui/button'
 import { Label } from './components/ui/label'
 import { JobList } from './components/custom/JobList'
-import { Popover, PopoverContent, PopoverTrigger } from './components/ui/popover'
 import { SettingsComponent } from './components/custom/Settings'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger
+} from './components/ui/drawer'
+import { ScrollArea } from './components/ui/scroll-area'
 
 interface JobPost {
   title: string
@@ -29,7 +39,7 @@ function AppComponent(): JSX.Element {
   const [blacklist, setBlacklist] = useState<Array<string>>([])
   const [newBlacklistWord, setNewBlacklistWord] = useState('')
   const [discardedJobCount, setDiscardedJobCount] = useState<number>(0)
-  const [discardedJobTitles, setDiscardedJobTitles] = useState<Array<string>>([])
+  const [discardedJobs, setDiscardedJobs] = useState<Array<JobPost>>([])
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -55,8 +65,8 @@ function AppComponent(): JSX.Element {
 
       if (result.success && result.data) {
         setJobs(result.data)
-        setDiscardedJobCount(result.meta.discardedCount)
-        setDiscardedJobTitles(result.meta.discardedList)
+        setDiscardedJobCount(result.meta.discardedList.length)
+        setDiscardedJobs(result.meta.discardedList)
       } else {
         setError(result.error || 'Unknown error occurred')
       }
@@ -248,17 +258,28 @@ function AppComponent(): JSX.Element {
               Found {jobs.length} jobs
             </Badge>
 
-            <Popover>
-              <PopoverTrigger>
+            <Drawer>
+              <DrawerTrigger>
                 <Badge variant="secondary">
-                  <BadgeCheckIcon className="mr-2" />
+                  <Trash className="mr-2" />
                   Discarded {discardedJobCount} jobs
                 </Badge>
-              </PopoverTrigger>
-              <PopoverContent className="text-xs w-96">
-                {discardedJobTitles.join(', ')}
-              </PopoverContent>
-            </Popover>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Jobs I discarded due to blacklist settings</DrawerTitle>
+                  <DrawerDescription>Count: {discardedJobCount}</DrawerDescription>
+                </DrawerHeader>
+                <ScrollArea className="h-[450px] w-full rounded-md border p-4">
+                  <JobList jobs={discardedJobs} />
+                </ScrollArea>
+                <DrawerFooter>
+                  <DrawerClose>
+                    <Button variant="outline">Close</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
 
             <JobList jobs={jobs} />
           </div>

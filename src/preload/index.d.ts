@@ -7,7 +7,7 @@ interface CustomElectronAPI {
     success: boolean
     data?: JobPost[]
     error?: string
-    meta: { discardedCount: number; discardedList: Array<string> }
+    meta: { discardedList: Array<JobPost> }
   }>
   getJobSources: () => Promise<string[]>
   loadBlacklist: () => Promise<string[]>

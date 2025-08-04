@@ -16,7 +16,6 @@ export function initRoutes(ipcMain): void {
 
       const relevantJobs = allJobs.filter(isRelevantJob)
       const discardedJobs = allJobs.filter((job) => !isRelevantJob(job))
-      const discardedTitles = discardedJobs.map((job) => job.title)
 
       console.log(
         `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`
@@ -25,7 +24,7 @@ export function initRoutes(ipcMain): void {
       return {
         success: true,
         data: relevantJobs,
-        meta: { discardedCount: discardedJobs.length, discardedList: discardedTitles }
+        meta: { discardedList: discardedJobs }
       }
     } catch (error) {
       console.error('Error in search-jobs handler:', error)
