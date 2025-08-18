@@ -3,15 +3,19 @@ import { Blacklist } from '../../src/utils/bannedKeywords'
 
 // Mock the Blacklist module
 jest.mock('../../src/utils/bannedKeywords')
-jest.mock('dotenv')
+
+// Mock dotenv
+jest.mock('dotenv', () => ({
+  config: jest.fn()
+}))
 
 const mockedBlacklist = Blacklist as jest.Mocked<typeof Blacklist>
 
 describe('filters', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.resetModules();
     // Set environment variable for testing
-    process.env.LOCATION = 'vienna'
   })
 
   afterEach(() => {
@@ -21,11 +25,12 @@ describe('filters', () => {
   describe('isRelevantJob', () => {
     it('should return true for relevant job with matching location', () => {
       mockedBlacklist.load.mockReturnValue([])
+      process.env.LOCATION = 'wien'
 
       const job = {
         title: 'Software Developer',
         url: 'https://example.com/job1',
-        location: 'Vienna, Austria',
+        location: 'wien',
         remote: false,
         description: 'Great opportunity for a developer'
       }
@@ -37,6 +42,7 @@ describe('filters', () => {
 
     it('should return true for remote job when location does not match', () => {
       mockedBlacklist.load.mockReturnValue([])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'Software Developer',
@@ -53,6 +59,7 @@ describe('filters', () => {
 
     it('should return false for non-remote job with non-matching location', () => {
       mockedBlacklist.load.mockReturnValue([])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'Software Developer',
@@ -69,6 +76,7 @@ describe('filters', () => {
 
     it('should return false when job title contains banned keyword', () => {
       mockedBlacklist.load.mockReturnValue(['spam', 'scam'])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'SPAM Developer Position',
@@ -85,6 +93,7 @@ describe('filters', () => {
 
     it('should return false when job URL contains banned keyword', () => {
       mockedBlacklist.load.mockReturnValue(['suspicious'])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'Software Developer',
@@ -101,6 +110,7 @@ describe('filters', () => {
 
     it('should return false when job description contains banned keyword', () => {
       mockedBlacklist.load.mockReturnValue(['mlm', 'pyramid'])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'Sales Representative',
@@ -117,6 +127,7 @@ describe('filters', () => {
 
     it('should handle missing description', () => {
       mockedBlacklist.load.mockReturnValue(['test'])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'Software Developer',
@@ -132,6 +143,7 @@ describe('filters', () => {
 
     it('should be case insensitive for all checks', () => {
       mockedBlacklist.load.mockReturnValue(['SPAM'])
+      process.env.LOCATION = 'Vienna, Austria'
 
       const job = {
         title: 'spam developer',

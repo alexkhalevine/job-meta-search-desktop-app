@@ -1,5 +1,5 @@
 import { Blacklist } from './bannedKeywords'
-import { LOCATION } from './env'
+import { getLocation } from './env'
 
 export function isRelevantJob(job: {
   title: string
@@ -11,15 +11,16 @@ export function isRelevantJob(job: {
   const title = job.title.toLowerCase()
   const description = (job.description || '').toLowerCase()
   const url = job.url.toLocaleLowerCase()
+  const location = getLocation()
 
-  const locationMatch = job.location.toLowerCase().includes(LOCATION)
+  const locationMatch = job.location.toLowerCase() === location.toLowerCase()
   const remoteMatch = job.remote && !locationMatch
   const locationOk = locationMatch || remoteMatch
 
-  const bannedKeywords = Blacklist.load()
-
+  const bannedKeywords: string[] = Blacklist.load()
   const isBlocked = bannedKeywords.some(
-    (keyword) => title.includes(keyword) || url.includes(keyword) || description.includes(keyword)
+    (keyword: string) =>
+      title.includes(keyword) || url.includes(keyword) || description.includes(keyword)
   )
 
   return locationOk && !isBlocked
