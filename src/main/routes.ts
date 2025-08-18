@@ -14,8 +14,8 @@ export function initRoutes(ipcMain): void {
 
       const allJobs = [...foundJobs]
 
-      const relevantJobs = allJobs.filter(isRelevantJob)
-      const discardedJobs = allJobs.filter((job) => !isRelevantJob(job))
+      const relevantJobs = allJobs.filter((job) => isRelevantJob(job).checkPassed)
+      const discardedJobs = allJobs.filter((job) => !isRelevantJob(job).checkPassed)
 
       console.log(
         `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`

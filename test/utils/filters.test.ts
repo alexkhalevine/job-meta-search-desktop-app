@@ -14,7 +14,7 @@ const mockedBlacklist = Blacklist as jest.Mocked<typeof Blacklist>
 describe('filters', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.resetModules();
+    jest.resetModules()
     // Set environment variable for testing
   })
 
@@ -37,7 +37,7 @@ describe('filters', () => {
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(true)
+      expect(result.checkPassed).toBe(true)
     })
 
     it('should return true for remote job when location does not match', () => {
@@ -54,7 +54,7 @@ describe('filters', () => {
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(true)
+      expect(result.checkPassed).toBe(true)
     })
 
     it('should return false for non-remote job with non-matching location', () => {
@@ -71,7 +71,9 @@ describe('filters', () => {
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(false)
+      expect(result.checkPassed).toBe(false)
+      expect(result.blockReason.locationCheckPassed).toBe(false)
+      expect(result.blockReason.wordCheckPassed).toBe(true)
     })
 
     it('should return false when job title contains banned keyword', () => {
@@ -88,7 +90,9 @@ describe('filters', () => {
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(false)
+      expect(result.checkPassed).toBe(false)
+      expect(result.blockReason.locationCheckPassed).toBe(true)
+      expect(result.blockReason.wordCheckPassed).toBe(false)
     })
 
     it('should return false when job URL contains banned keyword', () => {
@@ -105,7 +109,9 @@ describe('filters', () => {
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(false)
+      expect(result.checkPassed).toBe(false)
+      expect(result.blockReason.locationCheckPassed).toBe(true)
+      expect(result.blockReason.wordCheckPassed).toBe(false)
     })
 
     it('should return false when job description contains banned keyword', () => {
@@ -117,12 +123,14 @@ describe('filters', () => {
         url: 'https://example.com/job6',
         location: 'Vienna, Austria',
         remote: false,
-        description: 'Join our MLM network and earn big money'
+        description: 'Join our MLM network and earn big money in a pyramid'
       }
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(false)
+      expect(result.checkPassed).toBe(false)
+      expect(result.blockReason.locationCheckPassed).toBe(true)
+      expect(result.blockReason.wordCheckPassed).toBe(false)
     })
 
     it('should handle missing description', () => {
@@ -132,13 +140,15 @@ describe('filters', () => {
       const job = {
         title: 'Software Developer',
         url: 'https://example.com/job7',
-        location: 'Vienna, Austria',
+        location: 'Vienna',
         remote: false
       }
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(true)
+      expect(result.checkPassed).toBe(true)
+      expect(result.blockReason.locationCheckPassed).toBe(true)
+      expect(result.blockReason.wordCheckPassed).toBe(true)
     })
 
     it('should be case insensitive for all checks', () => {
@@ -155,7 +165,9 @@ describe('filters', () => {
 
       const result = isRelevantJob(job)
 
-      expect(result).toBe(false)
+      expect(result.checkPassed).toBe(false)
+      expect(result.blockReason.locationCheckPassed).toBe(true)
+      expect(result.blockReason.wordCheckPassed).toBe(false)
     })
   })
 })
