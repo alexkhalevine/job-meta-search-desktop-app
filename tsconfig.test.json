@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["src/utils/*"],
+      "@main/*": ["src/main/*"]
+    },
+    "types": ["node", "mocha", "chai"],
+    "declaration": false,
+    "outDir": "./out-test",
+    "allowImportingTsExtensions": false
+  },
+  "ts-node": {
+    "esm": false,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
+  "include": [
+    "test/**/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "out",
+    "dist",
+    "src/preload",
+    "src/renderer"
+  ]
+}
