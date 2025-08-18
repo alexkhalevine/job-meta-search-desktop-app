@@ -7,19 +7,13 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Button } from '../ui/button'
+import { DiscardedJobPostType } from '@/App'
 
-export interface JobPost {
-  title: string
-  company: string
-  location: string
-  remote: boolean
-  description: string
-  url: string
-  source: string
-  links?: Array<{ title: string; link: string }>
-}
-
-export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
+export const DiscardedJobList = ({
+  data
+}: {
+  data: DiscardedJobPostType[]
+}): JSX.Element | null => {
   const copyJobUrl = async (url: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(url)
@@ -51,31 +45,37 @@ export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
           <TableHead>company</TableHead>
           <TableHead>location</TableHead>
           <TableHead>description</TableHead>
+          <TableHead>discard reason</TableHead>
           <TableHead>source</TableHead>
           <TableHead>action</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody className="jobs-list" style={{ overflowY: 'auto', maxHeight: '400px' }}>
-        {jobs.map((job, index) => (
+        {data.map((jobItem, index) => (
           <TableRow key={index}>
-            <TableCell className="font-medium">{job.title}</TableCell>
-            <TableCell>{job.company}</TableCell>
+            <TableCell className="font-medium">{jobItem.job.title}</TableCell>
+            <TableCell>{jobItem.job.company}</TableCell>
             <TableCell>
-              {job.location} {job.remote && '🏠 Remote'}
+              {jobItem.job.location} {jobItem.job.remote && '🏠 Remote'}
             </TableCell>
             <TableCell>
-              {job.description.length > 300
-                ? `${job.description.substring(0, 300)}...`
-                : job.description}
+              {jobItem.job.description.length > 300
+                ? `${jobItem.job.description.substring(0, 300)}...`
+                : jobItem.job.description}
             </TableCell>
-            <TableCell className="text-right">{job.source}</TableCell>
+            <TableCell className="w-[200px]">
+              Location: {jobItem.blockReason.locationCheckPassed ? 'OK' : 'NOT OK'}
+              <br />
+              Blocked by blacklist word: {jobItem.blockReason.locationCheckPassed ? 'YES' : 'NO'}
+            </TableCell>
+            <TableCell className="text-right">{jobItem.job.source}</TableCell>
             <TableCell className="w-80 text-right">
-              {job.links && job.links.length > 0 ? (
-                Links(job)
+              {jobItem.job.links && jobItem.job.links.length > 0 ? (
+                Links(jobItem.job)
               ) : (
                 <Button
-                  onClick={() => copyJobUrl(job.url)}
+                  onClick={() => copyJobUrl(jobItem.job.url)}
                   className="view-job-button"
                   variant={'outline'}
                 >

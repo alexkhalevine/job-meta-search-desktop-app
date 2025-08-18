@@ -79,7 +79,6 @@ export class JobScraperService {
 
     // Handle google jobs results
     if (googleJobs.status === 'fulfilled') {
-      console.log('...... googleJobs ', googleJobs)
       allJobs.push(...googleJobs.value)
     } else {
       console.error('Google job scraping failed:', googleJobs.reason)

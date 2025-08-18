@@ -7,7 +7,15 @@ interface CustomElectronAPI {
     success: boolean
     data?: JobPost[]
     error?: string
-    meta: { discardedList: Array<JobPost> }
+    meta: {
+      discardedList: Array<{
+        job: JobPost
+        blockReason: {
+          locationCheckPassed: boolean
+          wordCheckPassed: boolean
+        }
+      }>
+    }
   }>
   getJobSources: () => Promise<string[]>
   loadBlacklist: () => Promise<string[]>

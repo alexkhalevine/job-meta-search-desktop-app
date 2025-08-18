@@ -4,6 +4,11 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initRoutes } from './routes'
 
+export type BlockReasonType = {
+  locationCheckPassed: boolean
+  wordCheckPassed: boolean
+}
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -18,8 +23,8 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.setFullScreen(true)
-  //mainWindow.webContents.openDevTools()
+  //mainWindow.setFullScreen(true)
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

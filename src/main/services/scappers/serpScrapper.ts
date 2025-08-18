@@ -32,8 +32,6 @@ export async function serpScrapper(config: SearchConfig): Promise<JobPost[]> {
     return []
   }
 
-  console.log('... scraping google jobs with key ', SERPAPI_KEY)
-
   try {
     const response = await axios.get(SERPAPI_URL, {
       params: {

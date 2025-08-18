@@ -21,8 +21,9 @@ import {
   DrawerTrigger
 } from './components/ui/drawer'
 import { ScrollArea } from './components/ui/scroll-area'
+import { DiscardedJobList } from './components/custom/DiscardedJobList'
 
-interface JobPost {
+export interface JobPost {
   title: string
   company: string
   location: string
@@ -30,6 +31,15 @@ interface JobPost {
   description: string
   url: string
   source: string
+  links?: Array<{ title: string; link: string }>
+}
+
+export type DiscardedJobPostType = {
+  job: JobPost
+  blockReason: {
+    locationCheckPassed: boolean
+    wordCheckPassed: boolean
+  }
 }
 
 function AppComponent(): JSX.Element {
@@ -39,7 +49,7 @@ function AppComponent(): JSX.Element {
   const [blacklist, setBlacklist] = useState<Array<string>>([])
   const [newBlacklistWord, setNewBlacklistWord] = useState('')
   const [discardedJobCount, setDiscardedJobCount] = useState<number>(0)
-  const [discardedJobs, setDiscardedJobs] = useState<Array<JobPost>>([])
+  const [discardedJobs, setDiscardedJobs] = useState<Array<DiscardedJobPostType>>([])
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -67,6 +77,8 @@ function AppComponent(): JSX.Element {
         setJobs(result.data)
         setDiscardedJobCount(result.meta.discardedList.length)
         setDiscardedJobs(result.meta.discardedList)
+
+        console.log("========= result.meta.discardedList ", result.meta.discardedList)
       } else {
         setError(result.error || 'Unknown error occurred')
       }
@@ -271,7 +283,7 @@ function AppComponent(): JSX.Element {
                   <DrawerDescription>Count: {discardedJobCount}</DrawerDescription>
                 </DrawerHeader>
                 <ScrollArea className="h-[450px] w-full rounded-md border p-4">
-                  <JobList jobs={discardedJobs} />
+                  <DiscardedJobList data={discardedJobs} />
                 </ScrollArea>
                 <DrawerFooter>
                   <DrawerClose>

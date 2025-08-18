@@ -9,17 +9,26 @@ export function initRoutes(ipcMain): void {
   // IPC handlers for job scraping
   ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
     try {
-      console.log('Received search request:', config)
       const foundJobs = await jobScraperService.searchJobs(config)
 
       const allJobs = [...foundJobs]
 
       const relevantJobs = allJobs.filter((job) => isRelevantJob(job).checkPassed)
-      const discardedJobs = allJobs.filter((job) => !isRelevantJob(job).checkPassed)
+      const discardedJobs = allJobs
+        .filter((job) => !isRelevantJob(job).checkPassed)
+        .map((job) => {
+          const filterResult = isRelevantJob(job)
+          return {
+            job,
+            blockReason: filterResult.blockReason
+          }
+        })
 
       console.log(
         `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`
       )
+
+      console.log("discardedJobs", discardedJobs)
 
       return {
         success: true,
