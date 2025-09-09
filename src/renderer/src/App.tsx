@@ -163,9 +163,7 @@ function AppComponent(): JSX.Element {
             <b>Job Search by</b>
             <DevprodLogo width={140} black="oklch(43.2% 0.232 292.759)" />
           </h1>
-          <p className="text-sm">
-            Search for jobs using our intelligent scraper. This is a meta-search tool
-          </p>
+          <p className="text-sm">Search for jobs using intelligent meta-search assistant tool</p>
           <div className="flex gap-2">
             <SettingsComponent />
             <ModeToggle />
@@ -301,6 +299,15 @@ function AppComponent(): JSX.Element {
           </div>
         )}
       </header>
+
+      <div className="mt-10 text-xs">
+        <p>Disclaimer</p>
+        <small>
+          This tool does not save any public data from any 3th party job search engine or service in
+          any data store.
+        </small>
+        <small>This is a non-profit personal productivity tool</small>
+      </div>
     </div>
   )
 }
