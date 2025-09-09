@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { BadgeX, FolderSearch, Trash } from 'lucide-react'
+import { BadgeX, Clock4, FolderSearch, Trash } from 'lucide-react'
 
 import { useEffect, useState } from 'react'
 import { ThemeProvider } from './components/theme-provider'
@@ -22,7 +22,7 @@ import {
 } from './components/ui/drawer'
 import { ScrollArea } from './components/ui/scroll-area'
 import { DiscardedJobList } from './components/custom/DiscardedJobList'
-
+import { DevprodLogo } from './components/DevProdIcon'
 export interface JobPost {
   title: string
   company: string
@@ -53,12 +53,10 @@ function AppComponent(): JSX.Element {
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cooldownActive, setCooldownActive] = useState(false)
 
   const handleSearch = async (): Promise<void> => {
-    console.log('Window object:', window)
-    console.log('ElectronAPI available:', !!window.electronAPI)
-    console.log('ElectronAPI object:', window.electronAPI)
-
+    if (cooldownActive) return
     if (!window.electronAPI) {
       setError('Electron API not available. Make sure the preload script is loaded.')
       return
@@ -77,8 +75,6 @@ function AppComponent(): JSX.Element {
         setJobs(result.data)
         setDiscardedJobCount(result.meta.discardedList.length)
         setDiscardedJobs(result.meta.discardedList)
-
-        console.log("========= result.meta.discardedList ", result.meta.discardedList)
       } else {
         setError(result.error || 'Unknown error occurred')
       }
@@ -86,6 +82,8 @@ function AppComponent(): JSX.Element {
       setError(err instanceof Error ? err.message : 'Failed to search jobs')
     } finally {
       setIsLoading(false)
+      setCooldownActive(true)
+      setTimeout(() => setCooldownActive(false), 10000)
     }
   }
 
@@ -161,8 +159,13 @@ function AppComponent(): JSX.Element {
     <div className="App p-10">
       <header className="App-header">
         <div className="flex justify-between items-center mb-10">
-          <h1 className="text-lg">Job Search</h1>
-          <p className="text-sm">Search for jobs using our intelligent scraper</p>
+          <h1 className="text-lg flex items-center">
+            <b>Job Search by</b>
+            <DevprodLogo width={140} black="oklch(43.2% 0.232 292.759)" />
+          </h1>
+          <p className="text-sm">
+            Search for jobs using our intelligent scraper. This is a meta-search tool
+          </p>
           <div className="flex gap-2">
             <SettingsComponent />
             <ModeToggle />
@@ -171,7 +174,7 @@ function AppComponent(): JSX.Element {
 
         <Separator />
 
-        <div className="mt-10 mb-10">
+        <div className="mt-10 mb-10 gap-5">
           <div className="flex gap-5">
             <div className="mb-5">
               <Label htmlFor="searchQuery">Search Keywords</Label>
@@ -196,7 +199,7 @@ function AppComponent(): JSX.Element {
             </div>
           </div>
 
-          <div id="blaclist-container" className="mb-5">
+          <div id="blacklist-container" className="my-5">
             <p className="text-sm mb-2">Blacklist</p>
             <div>
               {blacklist.map((blacklistText: string) => {
@@ -247,10 +250,11 @@ function AppComponent(): JSX.Element {
             <Button
               variant={'destructive'}
               onClick={handleSearch}
-              disabled={isLoading || !searchQuery.trim()}
+              disabled={isLoading || cooldownActive || !searchQuery.trim()}
               className="search-button"
             >
-              {isLoading ? 'Searching...' : 'Search Jobs'}
+              {cooldownActive && <Clock4 />}
+              {isLoading ? 'Searching...' : cooldownActive ? 'Cooldown' : 'Search Jobs'}
             </Button>
           </div>
         </div>
