@@ -5,3 +5,5 @@ out
 *.log*
 .env
 resources/settings.json
+.ai
+.vscode

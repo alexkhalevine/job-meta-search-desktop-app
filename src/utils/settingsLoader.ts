@@ -57,7 +57,6 @@ export const SettingsLoader = {
       if (!fs.existsSync(settingsPath)) {
         console.error('Settings file not found, creating default file')
 
-        // Create default settings content
         const defaultSettings: Settings = {
           secrets: {
             SERPAPI_KEY: ''
@@ -65,13 +64,11 @@ export const SettingsLoader = {
         }
 
         try {
-          // Try to create the directory if it doesn't exist
           const dir = path.dirname(settingsPath)
           if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true })
           }
 
-          // Create the file with default content
           fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2), 'utf8')
           console.log('Created default settings file at:', settingsPath)
         } catch (createError) {
