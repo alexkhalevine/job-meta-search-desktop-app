@@ -26,7 +26,7 @@ You can create this API key on https://serpapi.com.
 
 Preview of UI:
 
-<img width="1844" height="1057" alt="Screenshot 2025-07-31 at 12 03 44" src="https://github.com/user-attachments/assets/04b81b3c-f462-402e-9c8a-3ab1c41d5826" />
+<img width="1473" height="889" alt="Screenshot 2025-09-21 at 20 53 09" src="https://github.com/user-attachments/assets/8e0d8a62-ec3e-459d-865a-b541449c706d" />
 
 Settings section with option to add premium API keys:
 
