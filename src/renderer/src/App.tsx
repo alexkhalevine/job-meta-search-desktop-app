@@ -163,7 +163,7 @@ function AppComponent(): JSX.Element {
             <b>Job Search by</b>
             <DevprodLogo width={140} black="oklch(43.2% 0.232 292.759)" />
           </h1>
-          <p className="text-sm">Search for jobs using intelligent meta-search assistant tool</p>
+          <p className="text-sm">Look for jobs using intelligent meta-search assistant.</p>
           <div className="flex gap-2">
             <SettingsComponent />
             <ModeToggle />
@@ -256,57 +256,60 @@ function AppComponent(): JSX.Element {
             </Button>
           </div>
         </div>
-
-        {error && (
-          <div className="error-message">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-
-        <Separator />
-
-        {jobs.length > 0 && (
-          <div className="mt-5">
-            <Badge variant="default" className="mr-5">
-              <FolderSearch className="mr-2" />
-              Found {jobs.length} jobs
-            </Badge>
-
-            <Drawer>
-              <DrawerTrigger>
-                <Badge variant="secondary">
-                  <Trash className="mr-2" />
-                  Discarded {discardedJobCount} jobs
-                </Badge>
-              </DrawerTrigger>
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>Jobs I discarded due to blacklist settings</DrawerTitle>
-                  <DrawerDescription>Count: {discardedJobCount}</DrawerDescription>
-                </DrawerHeader>
-                <ScrollArea className="h-[450px] w-full rounded-md border p-4">
-                  <DiscardedJobList data={discardedJobs} />
-                </ScrollArea>
-                <DrawerFooter>
-                  <DrawerClose>
-                    <Button variant="outline">Close</Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
-
-            <JobList jobs={jobs} />
-          </div>
-        )}
       </header>
 
-      <div className="mt-10 text-xs">
+      {error && (
+        <div className="error-message">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      <Separator />
+
+      {jobs.length > 0 && (
+        <div className="mt-5 mb-20" id="job-list">
+          <Badge variant="default" className="mr-5">
+            <FolderSearch className="mr-2" />
+            Found {jobs.length} jobs
+          </Badge>
+
+          <Drawer>
+            <DrawerTrigger>
+              <Badge variant="secondary">
+                <Trash className="mr-2" />
+                View discarded {discardedJobCount} jobs
+              </Badge>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Jobs I discarded due to blacklist settings</DrawerTitle>
+                <DrawerDescription>Count: {discardedJobCount}</DrawerDescription>
+              </DrawerHeader>
+              <ScrollArea className="h-[450px] w-full rounded-md border p-4">
+                <DiscardedJobList data={discardedJobs} />
+              </ScrollArea>
+              <DrawerFooter>
+                <DrawerClose>
+                  <Button variant="outline">Close</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+
+          <JobList jobs={jobs} />
+        </div>
+      )}
+
+      <div
+        className={`${jobs.length > 0 ? 'relative mt-5 border-t' : 'fixed bottom-0 left-0 right-0 border-t'} bg-background/80 backdrop-blur-sm p-4 text-xs`}
+        id="disclaimer-text"
+      >
         <p>Disclaimer</p>
         <small>
           This tool does not save any public data from any 3th party job search engine or service in
           any data store.
         </small>
-        <small>This is a non-profit personal productivity tool</small>
+        <small className="pl-1">This is a non-profit personal productivity tool</small>
       </div>
     </div>
   )

@@ -79,7 +79,7 @@ export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
                   className="view-job-button"
                   variant={'outline'}
                 >
-                  Copy URL
+                  Click to copy link
                 </Button>
               )}
             </TableCell>
