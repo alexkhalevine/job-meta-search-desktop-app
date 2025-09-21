@@ -13,6 +13,7 @@ Currently, the tool is optimized for use in Austria. Support for additional regi
 3. Optional: create `.env` file with `SERPAPI_KEY=your_key`.
 
 `SERPAPI_KEY` env var, is optional, if you want to include job hits from indeed.com / google jobs.
+You can create this API key on https://serpapi.com.
 
 ## Building
 

@@ -18,7 +18,7 @@ export function DevprodLogo({
   width = 360,
   height = 96,
   green = '#19C37D',
-  black = '#111111',
+  black = 'oklch(43.2% 0.232 292.759)',
   title = 'devprod Logo'
 }: DevprodLogoProps): React.ReactElement {
   return (

@@ -7,6 +7,8 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Button } from '../ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useState } from 'react'
 
 export interface JobPost {
   title: string
@@ -20,11 +22,14 @@ export interface JobPost {
 }
 
 export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
+
   const copyJobUrl = async (url: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(url)
       console.log('URL copied to clipboard:', url)
-      // You could add a toast notification here if desired
+      setCopiedUrl(url)
+      setTimeout(() => setCopiedUrl(null), 2000)
     } catch (err) {
       console.error('Failed to copy URL:', err)
       // Fallback for older browsers
@@ -34,14 +39,27 @@ export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
+      setCopiedUrl(url)
+      setTimeout(() => setCopiedUrl(null), 2000)
     }
   }
-  const Links = (job) => {
-    return job.links.map((linkResult: { title: string; link: string }) => (
-      <Button key={linkResult.link} onClick={() => copyJobUrl(linkResult.link)}>
-        {linkResult.title}
-      </Button>
-    ))
+  const Links = (job: JobPost): JSX.Element[] => {
+    return (
+      job.links?.map((linkResult: { title: string; link: string }) => (
+        <TooltipProvider key={linkResult.link}>
+          <Tooltip open={copiedUrl === linkResult.link}>
+            <TooltipTrigger asChild>
+              <Button className="mr-2 mb-2" onClick={() => copyJobUrl(linkResult.link)}>
+                {linkResult.title}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-teal-500">
+              <p>Link copied.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )) || []
+    )
   }
   return (
     <Table>
@@ -74,13 +92,22 @@ export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
               {job.links && job.links.length > 0 ? (
                 Links(job)
               ) : (
-                <Button
-                  onClick={() => copyJobUrl(job.url)}
-                  className="view-job-button"
-                  variant={'outline'}
-                >
-                  Click to copy link
-                </Button>
+                <TooltipProvider>
+                  <Tooltip open={copiedUrl === job.url}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={() => copyJobUrl(job.url)}
+                        className="view-job-button"
+                        variant={'outline'}
+                      >
+                        Click to copy link
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Link copied.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </TableCell>
           </TableRow>

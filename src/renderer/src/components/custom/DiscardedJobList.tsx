@@ -8,17 +8,22 @@ import {
 } from '@/components/ui/table'
 import { Button } from '../ui/button'
 import { DiscardedJobPostType } from '@/App'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useState } from 'react'
 
 export const DiscardedJobList = ({
   data
 }: {
   data: DiscardedJobPostType[]
 }): JSX.Element | null => {
+  const [showTooltip, setShowTooltip] = useState<string | null>(null)
+
   const copyJobUrl = async (url: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(url)
       console.log('URL copied to clipboard:', url)
-      // You could add a toast notification here if desired
+      setShowTooltip(url)
+      setTimeout(() => setShowTooltip(null), 2000)
     } catch (err) {
       console.error('Failed to copy URL:', err)
       // Fallback for older browsers
@@ -28,13 +33,22 @@ export const DiscardedJobList = ({
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
+      setShowTooltip(url)
+      setTimeout(() => setShowTooltip(null), 2000)
     }
   }
   const Links = (job) => {
     return job.links.map((linkResult: { title: string; link: string }) => (
-      <Button key={linkResult.link} onClick={() => copyJobUrl(linkResult.link)}>
-        {linkResult.title}
-      </Button>
+      <Tooltip key={linkResult.link} open={showTooltip === linkResult.link}>
+        <TooltipTrigger asChild>
+          <Button onClick={() => copyJobUrl(linkResult.link)}>
+            {linkResult.title}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Link copied</p>
+        </TooltipContent>
+      </Tooltip>
     ))
   }
   return (
@@ -74,13 +88,20 @@ export const DiscardedJobList = ({
               {jobItem.job.links && jobItem.job.links.length > 0 ? (
                 Links(jobItem.job)
               ) : (
-                <Button
-                  onClick={() => copyJobUrl(jobItem.job.url)}
-                  className="view-job-button"
-                  variant={'outline'}
-                >
-                  Copy URL
-                </Button>
+                <Tooltip open={showTooltip === jobItem.job.url}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => copyJobUrl(jobItem.job.url)}
+                      className="view-job-button"
+                      variant={'outline'}
+                    >
+                      Copy URL
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Link copied</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </TableCell>
           </TableRow>

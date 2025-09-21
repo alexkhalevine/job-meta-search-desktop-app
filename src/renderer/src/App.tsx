@@ -23,6 +23,7 @@ import {
 import { ScrollArea } from './components/ui/scroll-area'
 import { DiscardedJobList } from './components/custom/DiscardedJobList'
 import { DevprodLogo } from './components/DevProdIcon'
+import { TooltipProvider } from './components/ui/tooltip'
 export interface JobPost {
   title: string
   company: string
@@ -156,12 +157,12 @@ function AppComponent(): JSX.Element {
   }, [])
 
   return (
-    <div className="App p-10">
-      <header className="App-header">
+    <div className="p-10">
+      <header className="border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-lg flex items-center">
             <b>Job Search by</b>
-            <DevprodLogo width={140} black="oklch(43.2% 0.232 292.759)" />
+            <DevprodLogo width={140} />
           </h1>
           <p className="text-sm">Look for jobs using intelligent meta-search assistant.</p>
           <div className="flex gap-2">
@@ -241,22 +242,24 @@ function AppComponent(): JSX.Element {
               </Button>
             </div>
           </div>
-
-          <Separator />
-
-          <div className="flex justify-center mt-9">
-            <Button
-              variant={'destructive'}
-              onClick={handleSearch}
-              disabled={isLoading || cooldownActive || !searchQuery.trim()}
-              className="search-button"
-            >
-              {cooldownActive && <Clock4 />}
-              {isLoading ? 'Searching...' : cooldownActive ? 'Cooldown' : 'Search Jobs'}
-            </Button>
-          </div>
         </div>
       </header>
+
+      <div className="flex justify-center my-9">
+        <Button
+          variant={'destructive'}
+          onClick={handleSearch}
+          disabled={isLoading || cooldownActive || !searchQuery.trim()}
+          className="search-button"
+        >
+          {cooldownActive && <Clock4 />}
+          {isLoading
+            ? 'Searching...'
+            : cooldownActive
+              ? 'Cooldown, wait a moment for next search'
+              : 'Search Jobs'}
+        </Button>
+      </div>
 
       {error && (
         <div className="error-message">
@@ -264,10 +267,11 @@ function AppComponent(): JSX.Element {
         </div>
       )}
 
-      <Separator />
-
       {jobs.length > 0 && (
-        <div className="mt-5 mb-20" id="job-list">
+        <div
+          className="mt-5 mb-20 border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background"
+          id="job-list"
+        >
           <Badge variant="default" className="mr-5">
             <FolderSearch className="mr-2" />
             Found {jobs.length} jobs
@@ -318,7 +322,9 @@ function AppComponent(): JSX.Element {
 function App(): JSX.Element {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <AppComponent />
+      <TooltipProvider>
+        <AppComponent />
+      </TooltipProvider>
     </ThemeProvider>
   )
 }
