@@ -38,7 +38,7 @@ export const DiscardedJobList = ({
     }
   }
   const Links = (job: DiscardedJobPostType): JSX.Element[] => {
-    return job.links.map((linkResult: { title: string; link: string }) => (
+    return job.job.links!.map((linkResult: { title: string; link: string }) => (
       <Tooltip key={linkResult.link} open={showTooltip === linkResult.link}>
         <TooltipTrigger asChild>
           <Button onClick={() => copyJobUrl(linkResult.link)}>{linkResult.title}</Button>
@@ -84,7 +84,7 @@ export const DiscardedJobList = ({
             <TableCell className="text-right">{jobItem.job.source}</TableCell>
             <TableCell className="w-80 text-right">
               {jobItem.job.links && jobItem.job.links.length > 0 ? (
-                Links(jobItem.job)
+                Links(jobItem)
               ) : (
                 <Tooltip open={showTooltip === jobItem.job.url}>
                   <TooltipTrigger asChild>
