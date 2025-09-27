@@ -55,7 +55,7 @@ appImage:
 npmRebuild: false
 publish:
   provider: github
-  owner: devprod
+  owner: alexkhalevine
   repo: job-meta-search-desktop-app
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
