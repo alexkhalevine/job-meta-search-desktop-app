@@ -9,9 +9,8 @@
 2. electron-vite
 3. react
 4. typescript
-5. radix-ui
-6. icons from lucide-react
-7. tailwind
+5. icons from lucide-react
+6. [shadcn](https://ui.shadcn.com/)
 
 # commands
 

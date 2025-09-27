@@ -73,4 +73,15 @@ export function initRoutes(ipcMain): void {
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   })
+
+  ipcMain.handle('settings-update-enable-advanced-crawling', async (_event, newValue: boolean) => {
+    try {
+      const result = await SettingsLoader.updateEnableAdvancedCrawling(newValue)
+      return {
+        success: result
+      }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  })
 }

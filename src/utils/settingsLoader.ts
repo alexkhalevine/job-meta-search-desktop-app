@@ -7,6 +7,7 @@ interface Settings {
   secrets: {
     SERPAPI_KEY: string
   }
+  enableAdvancedCrawling: boolean
   serpQuota?: number
 }
 
@@ -60,7 +61,8 @@ export const SettingsLoader = {
         const defaultSettings: Settings = {
           secrets: {
             SERPAPI_KEY: ''
-          }
+          },
+          enableAdvancedCrawling: false
         }
 
         try {
@@ -86,7 +88,8 @@ export const SettingsLoader = {
       return {
         secrets: {
           SERPAPI_KEY: ''
-        }
+        },
+        enableAdvancedCrawling: false
       }
     }
   },
@@ -94,6 +97,7 @@ export const SettingsLoader = {
   getSafeSettingsForUI: async (): Promise<Settings> => {
     // Mask the API key - show only first 4 characters, rest as asterisks
     const apiKey = SettingsLoader.getSerpApiKey()
+    const settings = SettingsLoader.load()
     const maskedApiKey =
       apiKey.length > 4 ? apiKey.substring(0, 4) + '*'.repeat(apiKey.length - 4) : apiKey
 
@@ -109,7 +113,8 @@ export const SettingsLoader = {
       secrets: {
         SERPAPI_KEY: maskedApiKey
       },
-      serpQuota
+      serpQuota,
+      enableAdvancedCrawling: settings.enableAdvancedCrawling
     }
   },
 
@@ -184,7 +189,8 @@ export const SettingsLoader = {
         currentSettings = {
           secrets: {
             SERPAPI_KEY: ''
-          }
+          },
+          enableAdvancedCrawling: false
         }
         // Create directory if it doesn't exist
         const dir = path.dirname(settingsPath)
@@ -203,6 +209,62 @@ export const SettingsLoader = {
       return true
     } catch (error) {
       console.error('Error updating SERPAPI_KEY:', error)
+      return false
+    }
+  },
+
+  updateEnableAdvancedCrawling: (newValue: boolean): boolean => {
+    try {
+      const isDev = process.env.NODE_ENV === 'development'
+      let settingsPath: string
+
+      if (isDev) {
+        // In development, use the resources folder directly
+        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
+      } else {
+        // In production, try multiple possible paths for macOS app bundles
+        const possiblePaths = [
+          path.join(process.resourcesPath, 'resources', 'settings.json'),
+          path.join(process.resourcesPath, 'settings.json'),
+          path.join(__dirname, '..', '..', 'resources', 'settings.json'),
+          path.join(process.cwd(), 'resources', 'settings.json'),
+          // Additional paths for macOS app bundle
+          path.join(process.resourcesPath, 'app', 'resources', 'settings.json'),
+          path.join(__dirname, '..', '..', '..', 'Resources', 'resources', 'settings.json')
+        ]
+
+        settingsPath = possiblePaths.find((p) => fs.existsSync(p)) || possiblePaths[0]
+      }
+
+      // Load current settings or create default if file doesn't exist
+      let currentSettings: any
+      if (fs.existsSync(settingsPath)) {
+        const fileContent = fs.readFileSync(settingsPath, 'utf8')
+        currentSettings = JSON.parse(fileContent)
+      } else {
+        currentSettings = {
+          secrets: {
+            SERPAPI_KEY: ''
+          },
+          enableAdvancedCrawling: false
+        }
+        // Create directory if it doesn't exist
+        const dir = path.dirname(settingsPath)
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true })
+        }
+      }
+
+      // Update the enableAdvancedCrawling setting
+      currentSettings.enableAdvancedCrawling = newValue
+
+      // Write back to file
+      fs.writeFileSync(settingsPath, JSON.stringify(currentSettings, null, 2), 'utf8')
+      console.log('Successfully updated enableAdvancedCrawling in settings.json')
+
+      return true
+    } catch (error) {
+      console.error('Error updating enableAdvancedCrawling:', error)
       return false
     }
   }

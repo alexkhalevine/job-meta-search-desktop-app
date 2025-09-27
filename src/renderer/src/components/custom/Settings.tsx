@@ -15,10 +15,11 @@ import { useEffect, useState } from 'react'
 import { Badge } from '../ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 
-type SettingsType = {
+export type SettingsType = {
   secrets?: {
     SERPAPI_KEY: string
   }
+  enableAdvancedCrawling: boolean
   serpQuota?: number
 }
 

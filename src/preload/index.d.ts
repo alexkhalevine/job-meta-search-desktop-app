@@ -1,5 +1,4 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { Settings } from 'electron'
 
 interface CustomElectronAPI {
   platform: string
@@ -26,10 +25,14 @@ interface CustomElectronAPI {
   }>
   loadSettings: () => Promise<{
     success: boolean
-    data?: Settings
+    data?: {
+      serpApiKey: string
+      enableAdvancedCrawling: boolean
+    }
     error?: string
   }>
   updateSerpApiKey: (newKey: string) => Promise<boolean>
+  updateSettingsAdvancedCrawling: (enabled: boolean) => Promise<boolean>
 }
 
 interface SearchConfig {

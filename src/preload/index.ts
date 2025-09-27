@@ -53,5 +53,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   updateSerpApiKey: async (newKey: string): Promise<{ success: boolean; error?: string }> => {
     return await ipcRenderer.invoke('settings-update-serp-key', newKey)
-  }
+  },
+  updateSettingsAdvancedCrawling: async (
+    newValue: boolean
+  ): Promise<{ success: boolean; error?: string }> =>
+    await ipcRenderer.invoke('settings-update-enable-advanced-crawling', newValue)
 })

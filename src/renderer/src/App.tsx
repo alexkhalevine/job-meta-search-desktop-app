@@ -9,7 +9,7 @@ import { Input } from './components/ui/input'
 import { Button } from './components/ui/button'
 import { Label } from './components/ui/label'
 import { JobList } from './components/custom/JobList'
-import { SettingsComponent } from './components/custom/Settings'
+import { SettingsComponent, SettingsType } from './components/custom/Settings'
 import {
   Drawer,
   DrawerClose,
@@ -24,6 +24,8 @@ import { ScrollArea } from './components/ui/scroll-area'
 import { DiscardedJobList } from './components/custom/DiscardedJobList'
 import { DevprodLogo } from './components/DevProdIcon'
 import { TooltipProvider } from './components/ui/tooltip'
+import { Switch } from '@/components/ui/switch'
+
 export interface JobPost {
   title: string
   company: string
@@ -55,6 +57,7 @@ function AppComponent(): JSX.Element {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cooldownActive, setCooldownActive] = useState(false)
+  const [advancedCrawlingEnabled, setAdvancedCrawlingEnabled] = useState(false)
 
   const handleSearch = async (): Promise<void> => {
     if (cooldownActive) return
@@ -152,8 +155,46 @@ function AppComponent(): JSX.Element {
     }
   }
 
+  const handleAdvancedCrawlingToggle = async (checked: boolean): Promise<void> => {
+    try {
+      const result = await window.electronAPI.updateSettingsAdvancedCrawling(checked)
+
+      if (result) {
+        setAdvancedCrawlingEnabled(checked)
+      } else {
+        setError(`Failed to update advanced crawling setting: ${result}`)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update advanced crawling setting')
+    }
+  }
+
+  const fetchSettings = async (): Promise<SettingsType | void> => {
+    if (!window.electronAPI) {
+      setError('Electron API not available. Make sure the preload script is loaded.')
+      return
+    }
+
+    try {
+      const result = await window.electronAPI.loadSettings()
+
+      if (result.success && result.data) {
+        const settings = result.data as SettingsType
+        setAdvancedCrawlingEnabled(settings.enableAdvancedCrawling || false)
+        console.log('Loaded settings:', settings)
+        console.log('Advanced crawling enabled:', settings.enableAdvancedCrawling)
+      } else {
+        console.log('Failed to load settings:', result)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load settings')
+      console.error('Settings loading error:', err)
+    }
+  }
+
   useEffect(() => {
     loadBlacklist()
+    fetchSettings()
   }, [])
 
   return (
@@ -198,50 +239,61 @@ function AppComponent(): JSX.Element {
             </div>
           </div>
 
-          <div id="blacklist-container" className="my-5">
-            <p className="text-sm mb-2">Blacklist</p>
-            <div>
-              {blacklist.map((blacklistText: string) => {
-                return (
-                  <Button
-                    key={blacklistText}
-                    className="delete-blacklisted-word mr-2 mb-2 group"
-                    variant={'outline'}
-                    onClick={() => deleteFromBlacklist(blacklistText)}
-                  >
-                    <BadgeX className="opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                    {blacklistText}
-                  </Button>
-                )
-              })}
+          <section className="flex">
+            <div id="blacklist-container" className="my-5">
+              <p className="text-sm mb-2">Blacklist</p>
+              <div>
+                {blacklist.map((blacklistText: string) => {
+                  return (
+                    <Button
+                      key={blacklistText}
+                      className="delete-blacklisted-word mr-2 mb-2 group"
+                      variant={'outline'}
+                      onClick={() => deleteFromBlacklist(blacklistText)}
+                    >
+                      <BadgeX className="opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      {blacklistText}
+                    </Button>
+                  )
+                })}
+              </div>
+              <div className="mt-4 flex items-center gap-5">
+                <Label htmlFor="newBlacklistWord" className="">
+                  Add blacklist word
+                </Label>
+                <Input
+                  id="newBlacklistWord"
+                  type="text"
+                  className="max-w-80"
+                  placeholder="e.g., pimp, dealer"
+                  value={newBlacklistWord}
+                  onChange={(e) => setNewBlacklistWord(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      addToBlacklist()
+                    }
+                  }}
+                />
+                <Button
+                  id="saveNewBlacklistWord"
+                  onClick={addToBlacklist}
+                  disabled={!newBlacklistWord.trim()}
+                  className=""
+                >
+                  Save
+                </Button>
+              </div>
             </div>
-            <div className="mt-4 flex items-center gap-5">
-              <Label htmlFor="newBlacklistWord" className="">
-                Add blacklist word
-              </Label>
-              <Input
-                id="newBlacklistWord"
-                type="text"
-                className="max-w-80"
-                placeholder="e.g., pimp, dealer"
-                value={newBlacklistWord}
-                onChange={(e) => setNewBlacklistWord(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    addToBlacklist()
-                  }
-                }}
+            <div className="border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background w-[200px]">
+              <p className="text-sm mb-2">Additional settings</p>
+              <Label>Enable advanced crawling</Label>
+              <Switch
+                id="enable-advanced-crawling-switch"
+                checked={advancedCrawlingEnabled}
+                onCheckedChange={handleAdvancedCrawlingToggle}
               />
-              <Button
-                id="saveNewBlacklistWord"
-                onClick={addToBlacklist}
-                disabled={!newBlacklistWord.trim()}
-                className=""
-              >
-                Save
-              </Button>
             </div>
-          </div>
+          </section>
         </div>
       </header>
 
