@@ -17,10 +17,10 @@ jobs:
         include:
           - os: macos-latest
             build_command: npm run build:mac
-            artifact_path: dist/*.{dmg,zip}
+            artifact_path: dist/*
           - os: windows-latest
             build_command: npm run build:win
-            artifact_path: dist/*.exe
+            artifact_path: dist/*
 
     runs-on: ${{ matrix.os }}
 
@@ -75,13 +75,23 @@ jobs:
           path: ./artifacts
 
       - name: Display artifact structure
-        run: ls -R ./artifacts
+        run: |
+          echo "=== Artifact directory structure ==="
+          ls -la ./artifacts/
+          echo "=== All files recursively ==="
+          find ./artifacts -type f -name "*" -exec ls -la {} \;
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p ./release-files
+          find ./artifacts -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.exe" \) -exec cp {} ./release-files/ \;
+          echo "=== Release files ==="
+          ls -la ./release-files/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            ./artifacts/**/*
+          files: ./release-files/*
           draft: false
           prerelease: false
           generate_release_notes: true
