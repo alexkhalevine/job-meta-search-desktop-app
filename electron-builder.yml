@@ -31,9 +31,6 @@ mac:
     - target: dmg
       arch:
         - x64
-    - target: zip
-      arch:
-        - x64
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.

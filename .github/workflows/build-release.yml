@@ -84,7 +84,8 @@ jobs:
       - name: Flatten artifacts
         run: |
           mkdir -p ./release-files
-          find ./artifacts -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.exe" \) -exec cp {} ./release-files/ \;
+          find ./artifacts -type f \( -name "*.dmg" -o -name "*.zip" \) -exec cp {} ./release-files/ \;
+          find ./artifacts -type f -name "*-setup.exe" -exec cp {} ./release-files/ \;
           echo "=== Release files ==="
           ls -la ./release-files/
 
