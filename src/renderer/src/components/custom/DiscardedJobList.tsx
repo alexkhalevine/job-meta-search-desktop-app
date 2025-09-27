@@ -37,13 +37,11 @@ export const DiscardedJobList = ({
       setTimeout(() => setShowTooltip(null), 2000)
     }
   }
-  const Links = (job) => {
+  const Links = (job: DiscardedJobPostType): JSX.Element[] => {
     return job.links.map((linkResult: { title: string; link: string }) => (
       <Tooltip key={linkResult.link} open={showTooltip === linkResult.link}>
         <TooltipTrigger asChild>
-          <Button onClick={() => copyJobUrl(linkResult.link)}>
-            {linkResult.title}
-          </Button>
+          <Button onClick={() => copyJobUrl(linkResult.link)}>{linkResult.title}</Button>
         </TooltipTrigger>
         <TooltipContent>
           <p>Link copied</p>

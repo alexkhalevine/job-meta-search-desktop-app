@@ -28,7 +28,7 @@ export function initRoutes(ipcMain): void {
         `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`
       )
 
-      console.log("discardedJobs", discardedJobs)
+      console.log('discardedJobs', discardedJobs)
 
       return {
         success: true,

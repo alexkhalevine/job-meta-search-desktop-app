@@ -32,7 +32,7 @@ export const SettingsComponent = (): JSX.Element => {
     fetchSettings()
   }, [])
 
-  const fetchSettings = async (): Promise<SettingsType | any> => {
+  const fetchSettings = async (): Promise<SettingsType | void> => {
     if (!window.electronAPI) {
       setError('Electron API not available. Make sure the preload script is loaded.')
       return
@@ -53,7 +53,7 @@ export const SettingsComponent = (): JSX.Element => {
     }
   }
 
-  const updateKey = async () => {
+  const updateKey = async (): Promise<void> => {
     if (!newKey) {
       return
     }

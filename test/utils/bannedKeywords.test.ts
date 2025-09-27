@@ -33,7 +33,9 @@ xdescribe('Blacklist', () => {
       const result = Blacklist.load()
 
       expect(result).toEqual([])
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Blacklist file not found, creating default file')
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Blacklist file not found, creating default file'
+      )
     })
 
     it('should return parsed JSON when file exists', () => {

@@ -5,12 +5,13 @@ This repository is configured with automated GitHub Actions to build and distrib
 ## How to Create a Release
 
   1. Commit your changes to main branch first:
-  git add .
-  git commit -m "Your changes"
-  git push origin main
+  - `git add .`
+  - `git commit -m "Your changes"`
+  - `git push origin main`
   2. Create and push the version tag:
-  npm version patch  # (or minor/major)
-  git push origin --tags
+  - `npm version patch`  # (or minor/major)
+  - `git push origin --tags`
+  - `git push`
 
 3. **GitHub Actions will automatically**:
    - Build binaries for Mac (DMG and ZIP)

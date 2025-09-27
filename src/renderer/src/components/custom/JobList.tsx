@@ -21,7 +21,7 @@ export interface JobPost {
   links?: Array<{ title: string; link: string }>
 }
 
-export const JobList = ({ jobs }: { jobs: any[] }): JSX.Element => {
+export const JobList = ({ jobs }: { jobs: JobPost[] }): JSX.Element => {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
 
   const copyJobUrl = async (url: string): Promise<void> => {
