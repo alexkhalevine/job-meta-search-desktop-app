@@ -1,6 +1,6 @@
 {
   "name": "jobseek",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Look for jobs using intelligent meta-search assistant.",
   "main": "./out/main/index.js",
   "author": "devprod",
