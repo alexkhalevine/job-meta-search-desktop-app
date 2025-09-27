@@ -12,3 +12,13 @@
 5. radix-ui
 6. icons from lucide-react
 7. tailwind
+
+# commands
+
+1. release: 
+   - run "git add ."
+   - run "git commit -m" and add short but meaningful commit message
+   - run "npm version patch"
+   - run "git push origin --tags"
+   - run ""
+- release
