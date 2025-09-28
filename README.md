@@ -6,6 +6,69 @@ This tool does not store any public data from third-party job search engines or 
 
 Currently, the tool is optimized for use in Austria. Support for additional regions will follow.
 
+## 🚀 Features
+
+### **Meta-Search Across Multiple Platforms**
+This application aggregates job listings from major Austrian job platforms, providing a comprehensive search experience:
+
+#### **Supported Job Platforms:**
+- **🏢 karriere.at** - Austria's leading job portal
+- **💼 stepstone.at** - Professional career opportunities
+- **🏠 willhaben.at** - Austria's largest classifieds including jobs
+- **📋 jobs.at** - Comprehensive job listings
+- **🌐 jobs.derstandard.at** - Der Standard newspaper job portal
+- **🔍 Google Jobs** - Global job search (via SerpAPI)
+- **🏛️ jobs.wien.gv.at** - Vienna municipal government positions (Advanced feature)
+
+### **Smart Job Management Features**
+
+#### **🔍 Intelligent Search**
+- **Multi-platform querying** with a single search
+- **Location-based filtering** for targeted results
+- **Real-time lookup** with ETL (Extract-Transform-Load) pipeline
+- **Duplicate detection** across different platforms
+
+#### **📊 Advanced Filtering & Organization**
+- **Blacklist functionality** to exclude unwanted companies or keywords
+- **Remote work detection** automatically identifies work-from-home opportunities
+- **Salary information extraction** when available
+- **Job posting freshness** with timestamps and posting dates
+
+#### **⚙️ Customizable Experience**
+- **Advanced search toggle** for additional sources (Wien municipal jobs)
+- **API key configuration** for premium features (SerpAPI/Google Jobs)
+- **Cross-platform compatibility** (Windows, macOS, Linux)
+- **Offline functionality** for cached results
+
+#### **🛡️ Privacy & Ethics**
+- **No data storage** of third-party job listings
+- **Non-profit personal tool** designed for productivity
+- **Local processing** - all data stays on your device
+
+### **Technical Advantages**
+
+#### **🏗️ Modern Architecture**
+- **ETL Pipeline** for consistent data processing
+- **TypeScript** for type safety and reliability
+- **Electron-based desktop app** for native performance
+- **React frontend** with modern UI components
+- **Automated testing** with Jest framework
+
+#### **🔄 Robust Data Processing**
+- **Error handling** with graceful failures per platform
+- **Platform-specific parsing** optimized for each job site
+- **Concurrent processing** for faster results
+- **Automatic retry logic** for network issues
+
+### **Perfect for Job Seekers Who:**
+- ✅ Want to search multiple platforms simultaneously
+- ✅ Need to filter out specific companies or keywords
+- ✅ Prefer desktop applications over web interfaces
+- ✅ Value privacy and local data processing
+- ✅ Search for jobs in Austria (Wien, Salzburg, Linz, Graz, etc.)
+- ✅ Want to identify remote work opportunities quickly
+- ✅ Need to track job posting dates and freshness
+
 ## Development Setup
 
 1. Run `npm i`
