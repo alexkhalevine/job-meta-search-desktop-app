@@ -57,5 +57,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateSettingsAdvancedCrawling: async (
     newValue: boolean
   ): Promise<{ success: boolean; error?: string }> =>
-    await ipcRenderer.invoke('settings-update-enable-advanced-crawling', newValue)
+    await ipcRenderer.invoke('settings-update-enable-advanced-crawling', newValue),
+
+  // Progress message handling
+  onProgressMessage: (callback: (event: Electron.IpcRendererEvent, data: unknown) => void) => {
+    ipcRenderer.on('crawler-progress', callback)
+  },
+
+  removeProgressListener: (callback: (event: Electron.IpcRendererEvent, data: unknown) => void) => {
+    ipcRenderer.removeListener('crawler-progress', callback)
+  }
 })

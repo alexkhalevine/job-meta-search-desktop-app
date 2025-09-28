@@ -33,6 +33,8 @@ interface CustomElectronAPI {
   }>
   updateSerpApiKey: (newKey: string) => Promise<boolean>
   updateSettingsAdvancedCrawling: (enabled: boolean) => Promise<boolean>
+  onProgressMessage: (callback: (event: Electron.IpcRendererEvent, data: unknown) => void) => void
+  removeProgressListener: (callback: (event: Electron.IpcRendererEvent, data: unknown) => void) => void
 }
 
 interface SearchConfig {

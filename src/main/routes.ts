@@ -8,14 +8,14 @@ export function initRoutes(ipcMain: IpcMain): void {
   const jobScraperService = JobScraperService.getInstance()
 
   // IPC handlers for job scraping
-  ipcMain.handle('search-jobs', async (_event: IpcMainInvokeEvent, config: SearchConfig) => {
+  ipcMain.handle('search-jobs', async (event: IpcMainInvokeEvent, config: SearchConfig) => {
     try {
       // Input validation
       if (!config?.searchQuery?.trim()) {
         return { success: false, error: 'Search query is required' }
       }
 
-      const foundJobs = await jobScraperService.searchJobs(config)
+      const foundJobs = await jobScraperService.searchJobs(config, event)
 
       const allJobs = [...foundJobs]
 

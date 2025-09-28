@@ -25,6 +25,7 @@ import { DiscardedJobList } from './components/custom/DiscardedJobList'
 import { DevprodLogo } from './components/DevProdIcon'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip'
 import { Switch } from '@/components/ui/switch'
+import { CrawlingProgressModal } from './components/custom/CrawlingProgressModal'
 
 export interface JobPost {
   title: string
@@ -58,6 +59,7 @@ function AppComponent(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [cooldownActive, setCooldownActive] = useState(false)
   const [advancedCrawlingEnabled, setAdvancedCrawlingEnabled] = useState(false)
+  const [showProgressModal, setShowProgressModal] = useState(false)
 
   const handleSearch = async (): Promise<void> => {
     if (cooldownActive) return
@@ -68,6 +70,7 @@ function AppComponent(): JSX.Element {
 
     setIsLoading(true)
     setError(null)
+    setShowProgressModal(true)
 
     try {
       const result = await window.electronAPI.searchJobs({
@@ -375,6 +378,8 @@ function AppComponent(): JSX.Element {
         </small>
         <small className="pl-1">This is a non-profit personal productivity tool</small>
       </div>
+
+      <CrawlingProgressModal isOpen={showProgressModal} onOpenChange={setShowProgressModal} />
     </div>
   )
 }
