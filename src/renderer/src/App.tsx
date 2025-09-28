@@ -284,7 +284,7 @@ function AppComponent(): JSX.Element {
                 </Button>
               </div>
             </div>
-            <div className="border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background w-[200px]">
+            <div className="border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background w-[300px]">
               <p className="text-sm mb-2">Additional settings</p>
               <Label>Enable advanced crawling</Label>
               <Switch
