@@ -14,13 +14,10 @@
 
 # commands
 
-1. release: 
+1. release:
    - run "git add ."
    - run "git commit -m" and add short but meaningful commit message
-   - run "npm version patch"
-   - run "git push origin --tags"
-   - run ""
-- release
+   - run "npm version patch" (automatically pushes code and tags, triggers GitHub release with release notes)
 
 # future steps
 
