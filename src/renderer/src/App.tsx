@@ -43,6 +43,7 @@ export type DiscardedJobPostType = {
   blockReason: {
     locationCheckPassed: boolean
     wordCheckPassed: boolean
+    triggerWord?: string
   }
 }
 

@@ -79,7 +79,13 @@ export const DiscardedJobList = ({
             <TableCell className="w-[200px]">
               Location: {jobItem.blockReason.locationCheckPassed ? 'OK' : 'NOT OK'}
               <br />
-              Blocked by blacklist word: {jobItem.blockReason.locationCheckPassed ? 'YES' : 'NO'}
+              Blocked by blacklist word: {jobItem.blockReason.wordCheckPassed ? 'NO' : 'YES'}
+              {jobItem.blockReason.triggerWord && (
+                <>
+                  <br />
+                  Trigger word: "{jobItem.blockReason.triggerWord}"
+                </>
+              )}
             </TableCell>
             <TableCell className="text-right">{jobItem.job.source}</TableCell>
             <TableCell className="w-80 text-right">

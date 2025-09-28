@@ -10,8 +10,6 @@ This repository is configured with automated GitHub Actions to build and distrib
   - `git push origin main`
   2. Create and push the version tag:
   - `npm version patch`  # (or minor/major)
-  - `git push origin --tags`
-  - `git push`
 
 3. **GitHub Actions will automatically**:
    - Build binaries for Mac (DMG and ZIP)

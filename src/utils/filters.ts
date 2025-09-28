@@ -20,6 +20,7 @@ interface FilterResult {
     locationCheckPassed: boolean
     wordCheckPassed: boolean
     description?: string
+    triggerWord?: string
   }
   matchedBlacklistWords?: string[]
 }
@@ -57,7 +58,10 @@ export function isRelevantJob(job: JobInput): FilterResult {
     checkPassed: locationResult.passed && blacklistResult.passed,
     blockReason: {
       locationCheckPassed: locationResult.passed,
-      wordCheckPassed: blacklistResult.passed
+      wordCheckPassed: blacklistResult.passed,
+      ...(blacklistResult.matchedWords.length > 0 && {
+        triggerWord: blacklistResult.matchedWords[0]
+      })
     },
     ...(blacklistResult.matchedWords.length > 0 && {
       matchedBlacklistWords: blacklistResult.matchedWords

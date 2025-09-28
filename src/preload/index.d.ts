@@ -12,6 +12,7 @@ interface CustomElectronAPI {
         blockReason: {
           locationCheckPassed: boolean
           wordCheckPassed: boolean
+          triggerWord?: string
         }
       }>
     }

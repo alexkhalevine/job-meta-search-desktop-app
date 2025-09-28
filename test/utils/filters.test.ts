@@ -77,7 +77,7 @@ describe('filters', () => {
       expect(result.blockReason.wordCheckPassed).toBe(true)
     })
 
-    it('should return false when job title contains banned keyword', () => {
+    it('should return false when job title contains banned keyword and track trigger word', () => {
       mockedBlacklist.load.mockReturnValue(['spam', 'scam'])
       process.env.LOCATION = 'Vienna, Austria'
 
@@ -94,9 +94,11 @@ describe('filters', () => {
       expect(result.checkPassed).toBe(false)
       expect(result.blockReason.locationCheckPassed).toBe(true)
       expect(result.blockReason.wordCheckPassed).toBe(false)
+      expect(result.blockReason.triggerWord).toBe('spam')
+      expect(result.matchedBlacklistWords).toContain('spam')
     })
 
-    it('should return false when job URL contains banned keyword', () => {
+    it('should return false when job URL contains banned keyword and track trigger word', () => {
       mockedBlacklist.load.mockReturnValue(['suspicious'])
       process.env.LOCATION = 'Vienna, Austria'
 
@@ -113,6 +115,8 @@ describe('filters', () => {
       expect(result.checkPassed).toBe(false)
       expect(result.blockReason.locationCheckPassed).toBe(true)
       expect(result.blockReason.wordCheckPassed).toBe(false)
+      expect(result.blockReason.triggerWord).toBe('suspicious')
+      expect(result.matchedBlacklistWords).toContain('suspicious')
     })
 
     it('should return false when job description contains banned keyword', () => {
