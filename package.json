@@ -57,7 +57,6 @@
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
     "@electron-toolkit/eslint-config-ts": "^2.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
-    "@rollup/rollup-darwin-x64": "^4.52.3",
     "@types/cheerio": "^0.22.35",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.17.6",
