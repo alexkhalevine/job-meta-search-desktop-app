@@ -23,7 +23,7 @@ import {
 import { ScrollArea } from './components/ui/scroll-area'
 import { DiscardedJobList } from './components/custom/DiscardedJobList'
 import { DevprodLogo } from './components/DevProdIcon'
-import { TooltipProvider } from './components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip'
 import { Switch } from '@/components/ui/switch'
 
 export interface JobPost {
@@ -284,14 +284,22 @@ function AppComponent(): JSX.Element {
                 </Button>
               </div>
             </div>
-            <div className="border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background w-[300px]">
-              <p className="text-sm mb-2">Additional settings</p>
-              <Label>Enable advanced crawling</Label>
-              <Switch
-                id="enable-advanced-crawling-switch"
-                checked={advancedCrawlingEnabled}
-                onCheckedChange={handleAdvancedCrawlingToggle}
-              />
+            <div className="border border-slate-200 dark:border-slate-900 rounded-lg p-6 bg-background w-[600px]">
+              <p className="text-sm mb-5 text-secondary font-bold">More filters</p>
+
+              <Label className="flex items-center justify-between w-full">
+                <Tooltip>
+                  <TooltipTrigger>Advanced search</TooltipTrigger>
+                  <TooltipContent>
+                    <p>Search complex pages, like jobs.wien.gv.at. Makes search slower</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Switch
+                  id="enable-advanced-crawling-switch"
+                  checked={advancedCrawlingEnabled}
+                  onCheckedChange={handleAdvancedCrawlingToggle}
+                />
+              </Label>
             </div>
           </section>
         </div>

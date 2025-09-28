@@ -26,8 +26,8 @@ module.exports = {
           foreground: 'oklch(43.2% 0.232 292.759)'
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))'
+          DEFAULT: '#19C37D',
+          foreground: '#19C37D'
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
