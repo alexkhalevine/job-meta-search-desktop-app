@@ -4,6 +4,7 @@ import willhabbenCrawler from './scappers/willhabbenScrapper'
 import serpCrawler from './scappers/serpScrapper'
 import jobsAtCrawler from './scappers/jobsAtScrapper'
 import wienJobsCrawler from './scappers/wienJobsCrawler'
+import derStandardCrawler from './scappers/derStandardScrapper'
 import { store } from './scappers/store'
 import { NormalizedItem } from './scappers/types'
 import { SettingsLoader } from '../../utils/settingsLoader'
@@ -53,7 +54,8 @@ export class JobScraperService {
       (): Promise<NormalizedItem[]> => this.runCrawler(stepstoneCrawler, config),
       (): Promise<NormalizedItem[]> => this.runCrawler(willhabbenCrawler, config),
       (): Promise<NormalizedItem[]> => this.runCrawler(jobsAtCrawler, config),
-      (): Promise<NormalizedItem[]> => this.runCrawler(serpCrawler, config)
+      (): Promise<NormalizedItem[]> => this.runCrawler(serpCrawler, config),
+      (): Promise<NormalizedItem[]> => this.runCrawler(derStandardCrawler, config)
     ]
 
     // Add Wien jobs crawler if advanced crawling is enabled
@@ -76,7 +78,8 @@ export class JobScraperService {
         'stepstone.at',
         'willhaben.at',
         'jobs.at',
-        'google_jobs_via_serpapi'
+        'google_jobs_via_serpapi',
+        'jobs.derstandard.at'
       ]
       if (isAdvancedCrawlingEnabled && index === crawlerNames.length) {
         crawlerNames.push('jobs.wien.gv.at')
