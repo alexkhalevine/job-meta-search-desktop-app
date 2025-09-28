@@ -83,7 +83,7 @@ export const DiscardedJobList = ({
               {jobItem.blockReason.triggerWord && (
                 <>
                   <br />
-                  Trigger word: "{jobItem.blockReason.triggerWord}"
+                  Trigger word: &quot;{jobItem.blockReason.triggerWord}&quot;
                 </>
               )}
             </TableCell>
