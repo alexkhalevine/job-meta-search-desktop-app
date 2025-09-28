@@ -342,7 +342,7 @@ function AppComponent(): JSX.Element {
 
           <Drawer>
             <DrawerTrigger>
-              <Badge variant="secondary">
+              <Badge variant="outline">
                 <Trash className="mr-2" />
                 View discarded {discardedJobCount} jobs
               </Badge>

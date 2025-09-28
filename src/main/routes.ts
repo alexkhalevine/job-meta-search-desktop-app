@@ -40,6 +40,18 @@ export function initRoutes(ipcMain: IpcMain): void {
         `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`
       )
 
+      // Emit final summary message
+      if (event) {
+        const summaryMessage = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          message: `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`,
+          timestamp: Date.now(),
+          type: 'success' as const,
+          source: 'Summary'
+        }
+        event.sender.send('crawler-progress', summaryMessage)
+      }
+
       return {
         success: true,
         data: relevantJobs,

@@ -48,14 +48,15 @@ export function CrawlingProgressModal({
 
       // Check if this is a completion message
       if (
+        data.message.includes('Total jobs found:') ||
         data.message.includes('unique jobs after deduplication') ||
         data.message.includes('Search completed')
       ) {
         setIsComplete(true)
-        // Auto-close after 3 seconds when complete
+        // Auto-close after 2 seconds when complete so users can read the summary
         setTimeout(() => {
           onOpenChange(false)
-        }, 3000)
+        }, 2000)
       }
     }
 
@@ -85,7 +86,7 @@ export function CrawlingProgressModal({
   const getMessageIcon = (type: string): JSX.Element => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-brand" />
       case 'error':
         return <div className="h-4 w-4 bg-red-500 rounded-full" />
       default:
@@ -110,7 +111,7 @@ export function CrawlingProgressModal({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             {!isComplete && <Loader2 className="h-5 w-5 animate-spin" />}
-            {isComplete && <CheckCircle className="h-5 w-5 text-green-500" />}
+            {isComplete && <CheckCircle className="h-5 w-5 text-brand" />}
             {isComplete ? 'Crawling Complete' : 'Crawling Job Sources...'}
           </AlertDialogTitle>
           <AlertDialogDescription>
@@ -155,7 +156,7 @@ export function CrawlingProgressModal({
 
         {isComplete && (
           <div className="text-center text-sm text-muted-foreground">
-            Modal will close automatically in a few seconds...
+            Modal will close automatically in 2 seconds...
           </div>
         )}
       </AlertDialogContent>

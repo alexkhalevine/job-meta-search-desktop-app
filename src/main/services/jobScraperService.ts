@@ -118,7 +118,7 @@ export class JobScraperService {
         console.log(`✅ ${crawlerName} returned ${result.value.length} jobs`)
         this.emitProgress(
           event,
-          `${crawlerName} completed. Found ${result.value.length} jobs.`,
+          `${crawlerName} returned ${result.value.length} jobs`,
           'success',
           crawlerName
         )
