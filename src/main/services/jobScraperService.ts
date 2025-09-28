@@ -1,9 +1,11 @@
-import { scrapeKarriere } from './scappers/karriereScrapper'
-import { scrapStepstone } from './scappers/stepStoneScrapper'
-import { scrapWillhaben } from './scappers/willhabbenScrapper'
-import { serpScrapper } from './scappers/serpScrapper'
-import { scrapeJobsAt } from './scappers/jobsAtScrapper'
-import { scrapeWienJobs } from './scappers/wienJobsCrawler'
+import karriereCrawler from './scappers/karriereScrapper'
+import stepstoneCrawler from './scappers/stepStoneScrapper'
+import willhabbenCrawler from './scappers/willhabbenScrapper'
+import serpCrawler from './scappers/serpScrapper'
+import jobsAtCrawler from './scappers/jobsAtScrapper'
+import wienJobsCrawler from './scappers/wienJobsCrawler'
+import { store } from './scappers/store'
+import { NormalizedItem } from './scappers/types'
 import { SettingsLoader } from '../../utils/settingsLoader'
 
 export interface JobPost {
@@ -45,85 +47,72 @@ export class JobScraperService {
 
     console.log('🔧 Advanced crawling enabled:', isAdvancedCrawlingEnabled)
 
-    // Prepare scraper promises array
-    const scraperPromises = [
-      scrapeKarriere(config),
-      scrapStepstone(config),
-      scrapWillhaben(config),
-      scrapeJobsAt(config),
-      serpScrapper(config)
+    // Create crawler functions that accept config and use ETL pattern
+    const crawlerFunctions = [
+      (): Promise<NormalizedItem[]> => this.runCrawler(karriereCrawler, config),
+      (): Promise<NormalizedItem[]> => this.runCrawler(stepstoneCrawler, config),
+      (): Promise<NormalizedItem[]> => this.runCrawler(willhabbenCrawler, config),
+      (): Promise<NormalizedItem[]> => this.runCrawler(jobsAtCrawler, config),
+      (): Promise<NormalizedItem[]> => this.runCrawler(serpCrawler, config)
     ]
 
     // Add Wien jobs crawler if advanced crawling is enabled
     if (isAdvancedCrawlingEnabled) {
       console.log('🕷️ Adding Wien jobs crawler to the scraping queue')
-      scraperPromises.push(scrapeWienJobs(config))
+      crawlerFunctions.push(
+        (): Promise<NormalizedItem[]> => this.runCrawler(wienJobsCrawler, config)
+      )
     }
 
-    // Run all scrapers in parallel and handle failures gracefully
-    const scraperResults = await Promise.allSettled(scraperPromises)
+    // Run all crawlers in parallel and handle failures gracefully
+    const crawlerResults = await Promise.allSettled(crawlerFunctions.map((fn) => fn()))
 
-    // Destructure results based on whether Wien crawler was included
-    const [karriereJobs, stepstoneJobs, willhabenJobs, jobsAtJobs, googleJobs, wienJobs] =
-      scraperResults
+    const allNormalizedJobs: NormalizedItem[] = []
 
-    const allJobs: JobPost[] = []
-
-    // Handle karriere.at results
-    if (karriereJobs.status === 'fulfilled') {
-      allJobs.push(...karriereJobs.value)
-    } else {
-      console.error('Karriere.at scraping failed:', karriereJobs.reason)
-    }
-
-    // Handle stepstone.at results
-    if (stepstoneJobs.status === 'fulfilled') {
-      allJobs.push(...stepstoneJobs.value)
-    } else {
-      console.error('Stepstone.at scraping failed:', stepstoneJobs.reason)
-    }
-
-    // Handle willhaben.at results
-    if (willhabenJobs.status === 'fulfilled') {
-      allJobs.push(...willhabenJobs.value)
-    } else {
-      console.error('Willhaben.at scraping failed:', willhabenJobs.reason)
-    }
-
-    // Handle jobs.at results
-    if (jobsAtJobs.status === 'fulfilled') {
-      allJobs.push(...jobsAtJobs.value)
-    } else {
-      console.error('Jobs.at scraping failed:', jobsAtJobs.reason)
-    }
-
-    // Handle google jobs results
-    if (googleJobs.status === 'fulfilled') {
-      allJobs.push(...googleJobs.value)
-    } else {
-      console.error('Google job scraping failed:', googleJobs.reason)
-    }
-
-    // Handle Wien jobs results (only if advanced crawling is enabled)
-    if (isAdvancedCrawlingEnabled && wienJobs) {
-      if (wienJobs.status === 'fulfilled') {
-        allJobs.push(...wienJobs.value)
-        console.log(`✅ Wien jobs crawler returned ${wienJobs.value.length} jobs`)
-      } else {
-        console.error('Wien jobs crawler failed:', wienJobs.reason)
+    // Process results and collect normalized jobs
+    crawlerResults.forEach((result, index) => {
+      const crawlerNames = [
+        'karriere.at',
+        'stepstone.at',
+        'willhaben.at',
+        'jobs.at',
+        'google_jobs_via_serpapi'
+      ]
+      if (isAdvancedCrawlingEnabled && index === crawlerNames.length) {
+        crawlerNames.push('jobs.wien.gv.at')
       }
+
+      const crawlerName = crawlerNames[index] || `crawler-${index}`
+
+      if (result.status === 'fulfilled') {
+        allNormalizedJobs.push(...result.value)
+        console.log(`✅ ${crawlerName} returned ${result.value.length} jobs`)
+      } else {
+        console.error(`❌ ${crawlerName} failed:`, result.reason)
+      }
+    })
+
+    // Store normalized jobs in the ETL store
+    store.upsertMany(allNormalizedJobs)
+
+    console.log(`🎯 Total jobs collected: ${allNormalizedJobs.length}`)
+    return allNormalizedJobs
+  }
+
+  private async runCrawler(
+    crawler: typeof karriereCrawler,
+    config: SearchConfig
+  ): Promise<NormalizedItem[]> {
+    try {
+      const rawResults = await crawler.extract(config)
+      const normalizedResults = rawResults
+        .map((raw) => crawler.normalize(raw))
+        .filter((job): job is NormalizedItem => job !== null)
+
+      return normalizedResults
+    } catch (error) {
+      console.error(`Error running ${crawler.name}:`, error)
+      throw error
     }
-
-    /*   for (const job of relevantJobs) {
-    const summary = await analyzeJob(`Job title: ${job.title}, job dscription: ${job.description}`);
-    console.log(`🔍 ${job.title} @ ${job.company} (${job.location})`);
-    console.log('\n');
-    console.log("AI summary:");
-    console.log(summary);
-    console.log('➡️', job.url);
-    console.log('\n---\n');
-  } */
-
-    return allJobs
   }
 }

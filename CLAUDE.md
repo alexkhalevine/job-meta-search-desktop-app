@@ -48,6 +48,7 @@ export type Crawler = {
   normalize: (raw: ExtractResult) => NormalizedItem | null;
 };
 
+// store.ts — in-memory “L” of ETL
 const data: NormalizedItem[] = [];
 export const store = {
   upsertMany(items: NormalizedItem[]) {
