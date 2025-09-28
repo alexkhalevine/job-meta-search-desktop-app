@@ -1,4 +1,4 @@
-import { isRelevantJob } from '../../src/utils/filters'
+import { isRelevantJob, clearFilterCache } from '../../src/utils/filters'
 import { Blacklist } from '../../src/utils/bannedKeywords'
 
 // Mock the Blacklist module
@@ -15,6 +15,7 @@ describe('filters', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.resetModules()
+    clearFilterCache() // Clear the blacklist cache before each test
     // Set environment variable for testing
   })
 

@@ -3,6 +3,8 @@ import { scrapStepstone } from './scappers/stepStoneScrapper'
 import { scrapWillhaben } from './scappers/willhabbenScrapper'
 import { serpScrapper } from './scappers/serpScrapper'
 import { scrapeJobsAt } from './scappers/jobsAtScrapper'
+import { scrapeWienJobs } from './scappers/wienJobsCrawler'
+import { SettingsLoader } from '../../utils/settingsLoader'
 
 export interface JobPost {
   title: string
@@ -37,15 +39,33 @@ export class JobScraperService {
   }
 
   public async searchJobs(config: SearchConfig): Promise<JobPost[]> {
+    // Check if advanced crawling is enabled
+    const settings = SettingsLoader.load()
+    const isAdvancedCrawlingEnabled = settings.enableAdvancedCrawling
+
+    console.log('🔧 Advanced crawling enabled:', isAdvancedCrawlingEnabled)
+
+    // Prepare scraper promises array
+    const scraperPromises = [
+      scrapeKarriere(config),
+      scrapStepstone(config),
+      scrapWillhaben(config),
+      scrapeJobsAt(config),
+      serpScrapper(config)
+    ]
+
+    // Add Wien jobs crawler if advanced crawling is enabled
+    if (isAdvancedCrawlingEnabled) {
+      console.log('🕷️ Adding Wien jobs crawler to the scraping queue')
+      scraperPromises.push(scrapeWienJobs(config))
+    }
+
     // Run all scrapers in parallel and handle failures gracefully
-    const [karriereJobs, stepstoneJobs, willhabenJobs, jobsAtJobs, googleJobs] =
-      await Promise.allSettled([
-        scrapeKarriere(config),
-        scrapStepstone(config),
-        scrapWillhaben(config),
-        scrapeJobsAt(config),
-        serpScrapper(config)
-      ])
+    const scraperResults = await Promise.allSettled(scraperPromises)
+
+    // Destructure results based on whether Wien crawler was included
+    const [karriereJobs, stepstoneJobs, willhabenJobs, jobsAtJobs, googleJobs, wienJobs] =
+      scraperResults
 
     const allJobs: JobPost[] = []
 
@@ -82,6 +102,16 @@ export class JobScraperService {
       allJobs.push(...googleJobs.value)
     } else {
       console.error('Google job scraping failed:', googleJobs.reason)
+    }
+
+    // Handle Wien jobs results (only if advanced crawling is enabled)
+    if (isAdvancedCrawlingEnabled && wienJobs) {
+      if (wienJobs.status === 'fulfilled') {
+        allJobs.push(...wienJobs.value)
+        console.log(`✅ Wien jobs crawler returned ${wienJobs.value.length} jobs`)
+      } else {
+        console.error('Wien jobs crawler failed:', wienJobs.reason)
+      }
     }
 
     /*   for (const job of relevantJobs) {

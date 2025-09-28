@@ -39,3 +39,12 @@ To test builds without creating a release:
 - `.github/workflows/build-release.yml` - Main release workflow
 - `.github/workflows/test-build.yml` - Test builds on PR/push
 - `electron-builder.yml` - Build configuration
+
+## Advanced Crawling Feature
+
+The application now includes advanced crawling functionality using [Crawlee](https://crawlee.dev/):
+
+- **Enable/Disable**: Use the "Enable advanced crawling" switch in the app settings
+- **Target**: Crawls Wien municipal jobs from `jobs.wien.gv.at`
+- **Integration**: Automatically adds results to existing job search when enabled
+- **Technology**: Uses Playwright for robust web scraping

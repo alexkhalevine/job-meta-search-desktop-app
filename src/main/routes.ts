@@ -1,34 +1,44 @@
+import type { IpcMain, IpcMainInvokeEvent } from 'electron'
 import { isRelevantJob } from '@utils/filters'
 import { JobScraperService, SearchConfig } from './services/jobScraperService'
 import { Blacklist } from '@utils/bannedKeywords'
 import { SettingsLoader } from '@utils/settingsLoader'
 
-export function initRoutes(ipcMain): void {
+export function initRoutes(ipcMain: IpcMain): void {
   const jobScraperService = JobScraperService.getInstance()
 
   // IPC handlers for job scraping
-  ipcMain.handle('search-jobs', async (_event, config: SearchConfig) => {
+  ipcMain.handle('search-jobs', async (_event: IpcMainInvokeEvent, config: SearchConfig) => {
     try {
+      // Input validation
+      if (!config?.searchQuery?.trim()) {
+        return { success: false, error: 'Search query is required' }
+      }
+
       const foundJobs = await jobScraperService.searchJobs(config)
 
       const allJobs = [...foundJobs]
 
-      const relevantJobs = allJobs.filter((job) => isRelevantJob(job).checkPassed)
-      const discardedJobs = allJobs
-        .filter((job) => !isRelevantJob(job).checkPassed)
-        .map((job) => {
-          const filterResult = isRelevantJob(job)
-          return {
-            job,
-            blockReason: filterResult.blockReason
-          }
-        })
+      // Process each job only once to avoid repeated function calls
+      const jobResults = allJobs.map((job) => ({
+        job,
+        filterResult: isRelevantJob(job)
+      }))
+
+      const relevantJobs = jobResults
+        .filter(({ filterResult }) => filterResult.checkPassed)
+        .map(({ job }) => job)
+
+      const discardedJobs = jobResults
+        .filter(({ filterResult }) => !filterResult.checkPassed)
+        .map(({ job, filterResult }) => ({
+          job,
+          blockReason: filterResult.blockReason
+        }))
 
       console.log(
         `Total jobs found: ${allJobs.length}, Relevant jobs: ${relevantJobs.length}, Discarded jobs: ${discardedJobs.length}`
       )
-
-      console.log('discardedJobs', discardedJobs)
 
       return {
         success: true,
@@ -42,14 +52,32 @@ export function initRoutes(ipcMain): void {
   })
 
   ipcMain.handle('load-blacklist', async () => {
-    const blacklist = Blacklist.load()
-    return blacklist
+    try {
+      const blacklist = Blacklist.load()
+      return blacklist
+    } catch (error) {
+      console.error('Error loading blacklist:', error)
+      return []
+    }
   })
 
-  ipcMain.handle('update-blacklist', async (_event, blacklistArray: string[]) => {
-    const result = Blacklist.save(blacklistArray)
-    return result
-  })
+  ipcMain.handle(
+    'update-blacklist',
+    async (_event: IpcMainInvokeEvent, blacklistArray: string[]) => {
+      try {
+        // Input validation
+        if (!Array.isArray(blacklistArray)) {
+          return { success: false, error: 'Blacklist must be an array' }
+        }
+
+        const result = Blacklist.save(blacklistArray)
+        return result
+      } catch (error) {
+        console.error('Error updating blacklist:', error)
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+      }
+    }
+  )
 
   ipcMain.handle('get-settings', async () => {
     try {
@@ -63,25 +91,40 @@ export function initRoutes(ipcMain): void {
     }
   })
 
-  ipcMain.handle('settings-update-serp-key', async (_event, newKey: string) => {
+  ipcMain.handle('settings-update-serp-key', async (_event: IpcMainInvokeEvent, newKey: string) => {
     try {
-      const result = await SettingsLoader.updateSerpApiKey(newKey)
+      // Input validation
+      if (typeof newKey !== 'string') {
+        return { success: false, error: 'API key must be a string' }
+      }
+
+      const result = SettingsLoader.updateSerpApiKey(newKey)
       return {
         success: result
       }
     } catch (error) {
+      console.error('Error updating SERP API key:', error)
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   })
 
-  ipcMain.handle('settings-update-enable-advanced-crawling', async (_event, newValue: boolean) => {
-    try {
-      const result = await SettingsLoader.updateEnableAdvancedCrawling(newValue)
-      return {
-        success: result
+  ipcMain.handle(
+    'settings-update-enable-advanced-crawling',
+    async (_event: IpcMainInvokeEvent, newValue: boolean) => {
+      try {
+        // Input validation
+        if (typeof newValue !== 'boolean') {
+          return { success: false, error: 'Advanced crawling setting must be a boolean' }
+        }
+
+        const result = SettingsLoader.updateEnableAdvancedCrawling(newValue)
+        return {
+          success: result
+        }
+      } catch (error) {
+        console.error('Error updating advanced crawling setting:', error)
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
       }
-    } catch (error) {
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
-  })
+  )
 }

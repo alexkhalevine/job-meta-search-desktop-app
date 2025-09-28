@@ -237,7 +237,7 @@ export const SettingsLoader = {
       }
 
       // Load current settings or create default if file doesn't exist
-      let currentSettings: any
+      let currentSettings: Settings
       if (fs.existsSync(settingsPath)) {
         const fileContent = fs.readFileSync(settingsPath, 'utf8')
         currentSettings = JSON.parse(fileContent)
