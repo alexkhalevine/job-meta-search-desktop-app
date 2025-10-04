@@ -5,7 +5,7 @@ import { Blacklist } from './services/blacklistService'
 import { SettingsLoader } from '@utils/settingsLoader'
 
 export function initRoutes(ipcMain: IpcMain): void {
-  const jobScraperService = JobScraperService.getInstance()
+  const jobScraperService = new JobScraperService()
 
   // IPC handlers for job scraping
   ipcMain.handle('search-jobs', async (event: IpcMainInvokeEvent, config: SearchConfig) => {

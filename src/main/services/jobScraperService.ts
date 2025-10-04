@@ -33,15 +33,6 @@ export interface SearchResult {
   timestamp: Date
 }
 export class JobScraperService {
-  private static instance: JobScraperService
-
-  public static getInstance(): JobScraperService {
-    if (!JobScraperService.instance) {
-      JobScraperService.instance = new JobScraperService()
-    }
-    return JobScraperService.instance
-  }
-
   private emitProgress(
     event: IpcMainInvokeEvent | undefined,
     message: string,
@@ -62,8 +53,8 @@ export class JobScraperService {
   }
 
   public async searchJobs(config: SearchConfig, event?: IpcMainInvokeEvent): Promise<JobPost[]> {
-    // Check if advanced crawling is enabled
     const settings = SettingsLoader.load()
+    // Check if advanced crawling is enabled
     const isAdvancedCrawlingEnabled = settings.enableAdvancedCrawling
 
     console.log('🔧 Advanced crawling enabled:', isAdvancedCrawlingEnabled)
