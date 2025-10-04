@@ -1,7 +1,7 @@
 import type { IpcMain, IpcMainInvokeEvent } from 'electron'
 import { isRelevantJob } from '@utils/filters'
 import { JobScraperService, SearchConfig } from './services/jobScraperService'
-import { Blacklist } from '@utils/bannedKeywords'
+import { Blacklist } from './services/blacklistService'
 import { SettingsLoader } from '@utils/settingsLoader'
 
 export function initRoutes(ipcMain: IpcMain): void {

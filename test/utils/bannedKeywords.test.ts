@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { Blacklist } from '../../src/utils/bannedKeywords'
+import { Blacklist } from '../../src/main/services/blacklistService'
 
 // Mock fs module
 jest.mock('fs')

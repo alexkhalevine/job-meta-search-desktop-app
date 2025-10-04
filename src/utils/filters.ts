@@ -1,4 +1,4 @@
-import { Blacklist } from './bannedKeywords'
+import { Blacklist } from '../main/services/blacklistService'
 import { getLocation } from './env'
 
 // Cache blacklist to avoid repeated file I/O

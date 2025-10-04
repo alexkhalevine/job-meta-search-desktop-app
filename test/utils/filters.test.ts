@@ -1,8 +1,8 @@
 import { isRelevantJob, clearFilterCache } from '../../src/utils/filters'
-import { Blacklist } from '../../src/utils/bannedKeywords'
+import { Blacklist } from '../../src/main/services/blacklistService'
 
 // Mock the Blacklist module
-jest.mock('../../src/utils/bannedKeywords')
+jest.mock('../../src/main/services/blacklistService')
 
 // Mock dotenv
 jest.mock('dotenv', () => ({
