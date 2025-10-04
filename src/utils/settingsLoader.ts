@@ -29,68 +29,81 @@ interface SerpResponse {
 
 const isDev = process.env.NODE_ENV === 'development'
 
+const DEFAULT_SETTINGS: Settings = {
+  secrets: {
+    SERPAPI_KEY: ''
+  },
+  enableAdvancedCrawling: false
+}
+
+function getSettingsPath(): string {
+  if (isDev) {
+    return path.join(process.cwd(), 'resources', 'settings.json')
+  }
+
+  const possiblePaths = [
+    path.join(process.resourcesPath, 'resources', 'settings.json'),
+    path.join(process.resourcesPath, 'settings.json'),
+    path.join(__dirname, '..', '..', 'resources', 'settings.json'),
+    path.join(process.cwd(), 'resources', 'settings.json'),
+    path.join(process.resourcesPath, 'app', 'resources', 'settings.json'),
+    path.join(__dirname, '..', '..', '..', 'Resources', 'resources', 'settings.json')
+  ]
+
+  return possiblePaths.find((p) => fs.existsSync(p)) || possiblePaths[0]
+}
+
+function ensureSettingsFile(settingsPath: string): void {
+  if (fs.existsSync(settingsPath)) return
+
+  console.error('Settings file not found, creating default file')
+
+  const dir = path.dirname(settingsPath)
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
+
+  fs.writeFileSync(settingsPath, JSON.stringify(DEFAULT_SETTINGS, null, 2), 'utf8')
+  console.log('Created default settings file at:', settingsPath)
+}
+
+function loadSettings(settingsPath: string): Settings {
+  if (!fs.existsSync(settingsPath)) {
+    return DEFAULT_SETTINGS
+  }
+
+  const fileContent = fs.readFileSync(settingsPath, 'utf8')
+  return JSON.parse(fileContent)
+}
+
+function updateSetting(updater: (settings: Settings) => void): boolean {
+  try {
+    const settingsPath = getSettingsPath()
+    ensureSettingsFile(settingsPath)
+
+    const currentSettings = loadSettings(settingsPath)
+    updater(currentSettings)
+
+    fs.writeFileSync(settingsPath, JSON.stringify(currentSettings, null, 2), 'utf8')
+    return true
+  } catch (error) {
+    console.error('Error updating settings:', error)
+    return false
+  }
+}
+
 export const SettingsLoader = {
   load: (): Settings => {
     try {
-      let settingsPath: string
-
-      if (isDev) {
-        // In development, use the resources folder directly
-        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
-      } else {
-        // In production, try multiple possible paths for macOS app bundles
-        const possiblePaths = [
-          path.join(process.resourcesPath, 'resources', 'settings.json'),
-          path.join(process.resourcesPath, 'settings.json'),
-          path.join(__dirname, '..', '..', 'resources', 'settings.json'),
-          path.join(process.cwd(), 'resources', 'settings.json'),
-          // Additional paths for macOS app bundle
-          path.join(process.resourcesPath, 'app', 'resources', 'settings.json'),
-          path.join(__dirname, '..', '..', '..', 'Resources', 'resources', 'settings.json')
-        ]
-
-        settingsPath = possiblePaths.find((p) => fs.existsSync(p)) || possiblePaths[0]
-      }
-
+      const settingsPath = getSettingsPath()
       console.log('Loading settings from:', settingsPath)
       console.log('Settings file exists:', fs.existsSync(settingsPath))
 
-      if (!fs.existsSync(settingsPath)) {
-        console.error('Settings file not found, creating default file')
-
-        const defaultSettings: Settings = {
-          secrets: {
-            SERPAPI_KEY: ''
-          },
-          enableAdvancedCrawling: false
-        }
-
-        try {
-          const dir = path.dirname(settingsPath)
-          if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true })
-          }
-
-          fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2), 'utf8')
-          console.log('Created default settings file at:', settingsPath)
-        } catch (createError) {
-          console.error('Failed to create settings file:', createError)
-        }
-
-        return defaultSettings
-      }
-
-      const fileContent = fs.readFileSync(settingsPath, 'utf8')
-      return JSON.parse(fileContent)
+      ensureSettingsFile(settingsPath)
+      return loadSettings(settingsPath)
     } catch (error) {
       console.error('Error loading settings:', error)
-      // Return default settings on error
-      return {
-        secrets: {
-          SERPAPI_KEY: ''
-        },
-        enableAdvancedCrawling: false
-      }
+      return DEFAULT_SETTINGS
     }
   },
 
@@ -158,114 +171,18 @@ export const SettingsLoader = {
   },
 
   updateSerpApiKey: (newApiKey: string): boolean => {
-    try {
-      const isDev = process.env.NODE_ENV === 'development'
-      let settingsPath: string
-
-      if (isDev) {
-        // In development, use the resources folder directly
-        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
-      } else {
-        // In production, try multiple possible paths for macOS app bundles
-        const possiblePaths = [
-          path.join(process.resourcesPath, 'resources', 'settings.json'),
-          path.join(process.resourcesPath, 'settings.json'),
-          path.join(__dirname, '..', '..', 'resources', 'settings.json'),
-          path.join(process.cwd(), 'resources', 'settings.json'),
-          // Additional paths for macOS app bundle
-          path.join(process.resourcesPath, 'app', 'resources', 'settings.json'),
-          path.join(__dirname, '..', '..', '..', 'Resources', 'resources', 'settings.json')
-        ]
-
-        settingsPath = possiblePaths.find((p) => fs.existsSync(p)) || possiblePaths[0]
-      }
-
-      // Load current settings or create default if file doesn't exist
-      let currentSettings: Settings
-      if (fs.existsSync(settingsPath)) {
-        const fileContent = fs.readFileSync(settingsPath, 'utf8')
-        currentSettings = JSON.parse(fileContent)
-      } else {
-        currentSettings = {
-          secrets: {
-            SERPAPI_KEY: ''
-          },
-          enableAdvancedCrawling: false
-        }
-        // Create directory if it doesn't exist
-        const dir = path.dirname(settingsPath)
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true })
-        }
-      }
-
-      // Update the API key
-      currentSettings.secrets.SERPAPI_KEY = newApiKey
-
-      // Write back to file
-      fs.writeFileSync(settingsPath, JSON.stringify(currentSettings, null, 2), 'utf8')
-      console.log('Successfully updated SERPAPI_KEY in settings.json')
-
-      return true
-    } catch (error) {
-      console.error('Error updating SERPAPI_KEY:', error)
-      return false
-    }
+    const success = updateSetting((settings) => {
+      settings.secrets.SERPAPI_KEY = newApiKey
+    })
+    if (success) console.log('Successfully updated SERPAPI_KEY in settings.json')
+    return success
   },
 
   updateEnableAdvancedCrawling: (newValue: boolean): boolean => {
-    try {
-      const isDev = process.env.NODE_ENV === 'development'
-      let settingsPath: string
-
-      if (isDev) {
-        // In development, use the resources folder directly
-        settingsPath = path.join(process.cwd(), 'resources', 'settings.json')
-      } else {
-        // In production, try multiple possible paths for macOS app bundles
-        const possiblePaths = [
-          path.join(process.resourcesPath, 'resources', 'settings.json'),
-          path.join(process.resourcesPath, 'settings.json'),
-          path.join(__dirname, '..', '..', 'resources', 'settings.json'),
-          path.join(process.cwd(), 'resources', 'settings.json'),
-          // Additional paths for macOS app bundle
-          path.join(process.resourcesPath, 'app', 'resources', 'settings.json'),
-          path.join(__dirname, '..', '..', '..', 'Resources', 'resources', 'settings.json')
-        ]
-
-        settingsPath = possiblePaths.find((p) => fs.existsSync(p)) || possiblePaths[0]
-      }
-
-      // Load current settings or create default if file doesn't exist
-      let currentSettings: Settings
-      if (fs.existsSync(settingsPath)) {
-        const fileContent = fs.readFileSync(settingsPath, 'utf8')
-        currentSettings = JSON.parse(fileContent)
-      } else {
-        currentSettings = {
-          secrets: {
-            SERPAPI_KEY: ''
-          },
-          enableAdvancedCrawling: false
-        }
-        // Create directory if it doesn't exist
-        const dir = path.dirname(settingsPath)
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true })
-        }
-      }
-
-      // Update the enableAdvancedCrawling setting
-      currentSettings.enableAdvancedCrawling = newValue
-
-      // Write back to file
-      fs.writeFileSync(settingsPath, JSON.stringify(currentSettings, null, 2), 'utf8')
-      console.log('Successfully updated enableAdvancedCrawling in settings.json')
-
-      return true
-    } catch (error) {
-      console.error('Error updating enableAdvancedCrawling:', error)
-      return false
-    }
+    const success = updateSetting((settings) => {
+      settings.enableAdvancedCrawling = newValue
+    })
+    if (success) console.log('Successfully updated enableAdvancedCrawling in settings.json')
+    return success
   }
 }
