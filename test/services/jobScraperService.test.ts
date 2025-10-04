@@ -56,7 +56,7 @@ describe('JobScraperService', () => {
     mockEvent = {
       sender: {
         send: jest.fn()
-      } as any
+      } as unknown as IpcMainInvokeEvent['sender']
     }
 
     mockConfig = {
@@ -242,6 +242,7 @@ describe('JobScraperService', () => {
       ;(karriereCrawler.extract as jest.Mock).mockResolvedValue([{ raw: 'data' }])
       ;(karriereCrawler.normalize as jest.Mock).mockReturnValue(mockJob)
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await (service as any).runCrawler(
         karriereCrawler,
         mockConfig,
@@ -256,6 +257,7 @@ describe('JobScraperService', () => {
     it('should throw error when crawler fails', async () => {
       ;(karriereCrawler.extract as jest.Mock).mockRejectedValue(new Error('Crawler failed'))
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect((service as any).runCrawler(karriereCrawler, mockConfig)).rejects.toThrow(
         'Crawler failed'
       )
@@ -264,6 +266,7 @@ describe('JobScraperService', () => {
 
   describe('emitProgress()', () => {
     it('should emit progress message when event is provided', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(service as any).emitProgress(
         mockEvent as IpcMainInvokeEvent,
         'Test message',
@@ -284,12 +287,14 @@ describe('JobScraperService', () => {
     })
 
     it('should not emit when event is undefined', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(service as any).emitProgress(undefined, 'Test message', 'info')
 
       expect(mockEvent.sender?.send).not.toHaveBeenCalled()
     })
 
     it('should use default type "info" when not specified', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(service as any).emitProgress(mockEvent as IpcMainInvokeEvent, 'Test message')
 
       expect(mockEvent.sender?.send).toHaveBeenCalledWith(
