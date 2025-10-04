@@ -83,12 +83,21 @@ export const JobList = ({ jobs }: { jobs: JobPost[] }): JSX.Element => {
               {job.location} {job.remote && '🏠 Remote'}
             </TableCell>
             <TableCell>
-              {job.description.length > 300
-                ? `${job.description.substring(0, 300)}...`
-                : job.description}
+              {job.description.length > 100 ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p>{job.description.substring(0, 100)}...</p>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-96">
+                    <p className="p-5">{job.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                job.description
+              )}
             </TableCell>
-            <TableCell className="text-right">{job.source}</TableCell>
-            <TableCell className="w-80 text-right">
+            <TableCell className="text-left">{job.source}</TableCell>
+            <TableCell className="w-70 text-left">
               {job.links && job.links.length > 0 ? (
                 Links(job)
               ) : (
